@@ -6,6 +6,11 @@ site_author: Champalimaud Foundation
 repo_url: https://bitbucket.org/fchampalimaud/pythonvideoannotator-models
 
 pages:
-- Home: index.md
+- Home: 'index.md'
+- Models: 
+  - 'Project': 'models/project.md'
+  - 'Video': 'models/video.md'
+  - 'Object2d': 'models/object2d.md'
+  - 'Path': 'models/path.md'
 
 copyright: Copyright &copy; 2016 <a href="/release-notes/">Champalimaud Foundation</a>, Maintained by the <a href="/about/release-notes/#maintenance-team">Scientific Software Platform</a>.
