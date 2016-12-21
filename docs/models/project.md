@@ -1,15 +1,9 @@
 # Class models.Project
 
-## **Constructor**
-***************************
-
-### \_\_init\_\_()
-
-
 ## **Variables**
 ***************************
 
-### \_videos
+### self.\_videos
 
 Private variable where the videos from the project are stored.
 
@@ -18,7 +12,7 @@ Private variable where the videos from the project are stored.
 
 ### videos
 
-Can get and set the list of videos from a project.
+Used to get and set the list of videos of the project.
 
 ## **Functions**
 ***************************
@@ -27,15 +21,14 @@ Can get and set the list of videos from a project.
 
 Factory to create an object that represents the Video Model.
 
-### \_\_add\_\_
-
-Used to add a new child Model to the project.
-
 ```python
 project = Project()
 project.create_video()
 ```
 
+### \_\_add\_\_
+
+Used to add a new child Model to the project.
 
 ```python
 project = Project()

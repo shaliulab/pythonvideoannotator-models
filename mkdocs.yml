@@ -9,8 +9,8 @@ pages:
 - Home: 'index.md'
 - Models: 
   - 'Project': 'models/project.md'
-  - 'Video': 'models/video.md'
-  - 'Object2d': 'models/object2d.md'
-  - 'Path': 'models/path.md'
+  - 'video.Video': 'models/video.md'
+  - 'video.objects.Object2d': 'models/object2d.md'
+  - 'video.objects.object2d.datasets.Path': 'models/path.md'
 
 copyright: Copyright &copy; 2016 <a href="/release-notes/">Champalimaud Foundation</a>, Maintained by the <a href="/about/release-notes/#maintenance-team">Scientific Software Platform</a>.
