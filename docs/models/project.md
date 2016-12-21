@@ -17,16 +17,7 @@ Used to get and set the list of videos of the project.
 ## **Functions**
 ***************************
 
-### create_video
-
-Factory to create an object that represents the Video Model.
-
-```python
-project = Project()
-project.create_video()
-```
-
-### \_\_add\_\_
+### \_\_add\_\_(obj)
 
 Used to add a new child Model to the project.
 
@@ -37,7 +28,7 @@ project += Video()
 
 **note:** The example above is just to show what the function \_\_add\_\_ does. A child video should be added as the example shown in the create_video() function.
 
-### \_\_sub\_\_
+### \_\_sub\_\_(obj)
 
 ```python
 project = Project()
@@ -46,3 +37,23 @@ project += video
 project -= video
 ```
 
+### create_video
+
+Factory to create an object that represents the Video Model.
+
+```python
+project = Project()
+project.create_video()
+```
+
+### load(data, project_path=None)
+
+Function called to load the project.
+**data** - dictionary with the project description.
+**project_path** - path to the project.
+
+### save(data, project_path=None)
+
+Function called to save the project.
+**data** - dictionary where the project description will be stored.
+**project_path** - path where to save the project.
