@@ -1,0 +1,11 @@
+site_name: Python Video Annotator Models
+site_url: https://pythonvideoannotator-models.readthedocs.io/
+site_description: Models of the Python Video Annotator
+site_author: Champalimaud Foundation
+
+repo_url: https://bitbucket.org/fchampalimaud/pythonvideoannotator-models
+
+pages:
+- Home: index.md
+
+copyright: Copyright &copy; 2016 <a href="/release-notes/">Champalimaud Foundation</a>, Maintained by the <a href="/about/release-notes/#maintenance-team">Scientific Software Platform</a>.
