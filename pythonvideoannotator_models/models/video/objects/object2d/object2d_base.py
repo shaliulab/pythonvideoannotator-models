@@ -4,7 +4,7 @@ class Object2dBase(object):
 
 	def __init__(self, video):
 		self._datasets   = []	
-		self._name 		 = 'Undefined'
+		self.name 		 = 'object-{0}'.format(len(video.objects))
 
 		self._video = video
 		self._video += self
@@ -30,7 +30,7 @@ class Object2dBase(object):
 		return self
 
 	def __sub__(self, obj):
-		if isinstance(obj, Path): self._datasets.remove(obj)
+		if isinstance(obj, Path): self._datasets.remove(obj)			
 		return self
 
 	def __len__(self): 				return len(self.datasets)

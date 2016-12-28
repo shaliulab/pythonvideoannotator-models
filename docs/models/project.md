@@ -7,12 +7,20 @@
 
 Private variable where the videos from the project are stored.
 
+### self.\_path
+
+Private variable that stores the path of the project.
+
 ## **Properties**
 ***************************
 
 ### videos
 
 Used to get and set the list of videos of the project.
+
+### path
+
+Returns the path of the project.
 
 ## **Functions**
 ***************************

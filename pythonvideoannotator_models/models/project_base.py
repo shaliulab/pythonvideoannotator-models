@@ -6,6 +6,7 @@ class ProjectBase(object):
 
 	def __init__(self):
 		self._videos = []
+		self._path   = None
 
 	######################################################################################
 	#### FUNCTIONS #######################################################################
@@ -32,3 +33,6 @@ class ProjectBase(object):
 	def videos(self): return self._videos
 	@videos.setter
 	def videos(self, value): self._videos = value
+
+	@property
+	def path(self): return self._path
