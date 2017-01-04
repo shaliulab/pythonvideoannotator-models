@@ -1,0 +1,1 @@
+from pythonvideoannotator_models.models.video.image.image_io import ImageIO as Image
