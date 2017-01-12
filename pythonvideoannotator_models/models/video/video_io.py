@@ -45,8 +45,6 @@ class VideoIO(VideoBase):
 		with open(videoconf, 'w') as outfile:
 			json.dump(data, outfile)
 
-		self._path = video_path
-
 		return data
 
 	def load(self, data, video_path=None):
@@ -69,5 +67,3 @@ class VideoIO(VideoBase):
 		for img_dir in images_paths:
 			img = self.create_image()
 			img.load(data, img_dir)
-
-		self._path = video_path

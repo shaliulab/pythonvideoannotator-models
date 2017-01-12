@@ -1,12 +1,15 @@
 #! /usr/bin/python2
 # -*- coding: utf-8 -*-
+from pythonvideoannotator_models.models.imodel import IModel
 from pythonvideoannotator_models.models.video import Video
 
-class ProjectBase(object):
+class ProjectBase(IModel):
 
 	def __init__(self):
-		self._videos = []
-		self._path   = None
+		super(IModel, self).__init__()
+
+		self._videos 	= []
+		self._directory = None
 
 	######################################################################################
 	#### FUNCTIONS #######################################################################
@@ -14,12 +17,10 @@ class ProjectBase(object):
 
 	def __add__(self, obj):
 		if isinstance(obj, Video): self._videos.append(obj)
-
 		return self
 
 	def __sub__(self, obj):
 		if isinstance(obj, Video): self._videos.remove(obj)
-
 		return self
 		
 
@@ -35,4 +36,4 @@ class ProjectBase(object):
 	def videos(self, value): self._videos = value
 
 	@property
-	def path(self): return self._path
+	def directory(self): return self._directory

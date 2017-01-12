@@ -19,24 +19,28 @@ class PathIO(PathBase):
 	######################################################################################
 
 	def save(self, data, datasets_path=None):
-		dataset_path = os.path.join(datasets_path, 'path-{0}'.format(self.name))
-		if not os.path.exists(dataset_path): os.makedirs(dataset_path)
+		if not os.path.exists(self.directory): os.makedirs(self.directory)
 
-		data['path'] = dataset_path
+		data['factory-function'] = 'create_path'
 
-		dataset_file = os.path.join(dataset_path, 'path.cvs')
+		dataset_file = os.path.join(self.directory, 'path.cvs')
 		with open(dataset_file, 'w') as outfile:
 			outfile.write(';'.join(['frame','x','y'])+'\n' )
-			for index in range(len(self._path)):
+			for index in range(len(self)):
 				pos = self.get_position(index)
 				row = [index] + ([None, None] if pos is None else list(pos))
 				outfile.write(';'.join( map(str,row) ))
 				outfile.write('\n')
 
+
+		super(PathIO,self).save(data, datasets_path)
 		return data
 
 	def load(self, data, dataset_path=None):
 		dataset_file = os.path.join(dataset_path, 'path.cvs')
+
+		
+
 		with open(dataset_file, 'r') as infile:
 			infile.readline()
 			for i, line in enumerate(infile):

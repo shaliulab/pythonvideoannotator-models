@@ -1,9 +1,11 @@
+from pythonvideoannotator_models.models.imodel import IModel
 
-
-class ImageBase(object):
+class ImageBase(IModel):
 
 	def __init__(self, video):
-		self.name 	= 'image-{0}'.format(len(video.images))
+		super(IModel, self).__init__()
+
+		self.name 	= 'image({0})'.format(len(video)) if len(video)>0 else 'image'
 		self.image 	= None
 
 		self._video = video
@@ -27,11 +29,6 @@ class ImageBase(object):
 	def video(self): return self._video
 	@video.setter
 	def video(self, value): self._video = value
-
-	@property
-	def name(self): return self._name
-	@name.setter
-	def name(self, value): self._name = value
 
 	@property 
 	def video_capture(self):  return self.video.video_capture

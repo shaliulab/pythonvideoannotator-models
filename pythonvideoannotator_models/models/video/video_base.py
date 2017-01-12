@@ -5,52 +5,55 @@
 import cv2, os
 from pythonvideoannotator_models.models.video.objects.object2d import Object2D
 from pythonvideoannotator_models.models.video.image import Image
+from pythonvideoannotator_models.models.imodel import IModel
 
-class VideoBase(object):
+
+class VideoBase(IModel):
 
 	def __init__(self, project):
-		self._filename = None
-		self._videocap = None
-		self._path 	   = None
+		super(IModel, self).__init__()
+
 		self._project  = project
 		self._project  += self
 
-		self._objects  = []
-		self._images   = []
+		self.name 	   = ''
+		self._filename = None
+		self._videocap = None
+		
+		self._childrens = []
 			
 
 	######################################################################################
 	#### FUNCTIONS #######################################################################
 	######################################################################################
 
+	def __len__(self): return len(self._childrens)
 	def __str__(self): return self.name
 
 	def __add__(self, obj):
-		if isinstance(obj, Object2D): self._objects.append(obj)
-		if isinstance(obj, Image): self._images.append(obj)
+		if isinstance(obj, Object2D) or isinstance(obj, Image): self._childrens.append(obj)
 		return self
 
 	def __sub__(self, obj):
-		if isinstance(obj, Object2D): self._objects.remove(obj)
-		if isinstance(obj, Image): self._images.remove(obj)
+		if isinstance(obj, Object2D) or isinstance(obj, Image):  self._childrens.remove(obj)
 		return self
 
 	def create_object(self): return Object2D(self)
-	def create_image(self): return Image(self)
+	def create_image(self):  return Image(self)
 
 	######################################################################################
 	#### PROPERTIES ######################################################################
 	######################################################################################
 
-	
 	@property
-	def path(self): return self._path
+	def objects(self):
+		for child in self._childrens:
+			if isinstance(child, Object2D): yield child
 
 	@property
-	def objects(self): return self._objects
-
-	@property
-	def images(self): return self._images
+	def images(self): 
+		for child in self._childrens:
+			if isinstance(child, Image): yield child
 
 	@property
 	def filepath(self): return self._filename
@@ -58,19 +61,14 @@ class VideoBase(object):
 	def filepath(self, value): 
 		self._filename = value
 		self._videocap = cv2.VideoCapture(value)
+		filename 	   = os.path.basename(value)
+		self.name, _   = os.path.splitext(filename)
+
 
 	@property
 	def filename(self): return os.path.basename(self.filepath)
 	
-	@property
-	def name(self):
-		try:
-			name, extension = os.path.splitext(self.filename)
-			return name
-		except:
-			return ''
 	
-
 	@property
 	def video_capture(self): return self._videocap
 
@@ -79,3 +77,7 @@ class VideoBase(object):
 
 	@property
 	def project(self): 	return self._project
+
+	@property
+	def directory(self): return os.path.join( self.project.directory, 'videos', self.name )
+	
