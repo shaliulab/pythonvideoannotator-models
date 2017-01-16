@@ -26,8 +26,6 @@ class Object2dBase(IModel):
 	def create_contours(self): return Contours(self)
 	def create_value(self): return Value(self)
 
-	def draw(self, frame, frame_index):
-		for dataset in self.datasets: dataset.draw(frame, frame_index)
 		
 	######################################################################
 	### CLASS FUNCTIONS ##################################################
