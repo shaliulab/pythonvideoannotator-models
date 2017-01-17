@@ -73,6 +73,12 @@ class VideoBase(IModel):
 	def video_capture(self): return self._videocap
 
 	@property
+	def video_height(self): return int(self._videocap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+	@property
+	def video_width(self): return int(self._videocap.get(cv2.CAP_PROP_FRAME_WIDTH))
+
+	@property
 	def total_frames(self): return self.video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
 
 	@property
