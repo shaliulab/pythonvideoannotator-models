@@ -3,12 +3,12 @@ from pythonvideoannotator_models.models.video.objects.object2d.datasets.contours
 
 class ContoursIO(ContoursBase):
 
-	def save(self, data, datasets_path=None):
-		if not os.path.exists(self.directory): os.makedirs(self.directory)
+	FACTORY_FUNCTION = 'create_contours'
 
-		data['factory-function'] = 'create_contours'
-		
-		contours_file = os.path.join(self.directory, 'contours.csv')
+	def save(self, data, dataset_path=None):
+		data = super(ContoursIO, self).save(data, dataset_path)
+
+		contours_file = os.path.join(dataset_path, 'contours.csv')
 		with open(contours_file, 'wb') as outfile:
 			outfile.write(';'.join(['frame','contour','shape'])+'\n' )
 			for index in range(len(self)):
@@ -17,11 +17,11 @@ class ContoursIO(ContoursBase):
 				outfile.write(';'.join( map(str,row) ))
 				outfile.write('\n')
 
-		data = super(ContoursIO,self).save(data, datasets_path)
 		return data
 
 	def load(self, data, dataset_path=None):
-		super(ContoursIO, self).load(data, dataset_path)
+		data = super(ContoursIO, self).load(data, dataset_path)
+
 		contours_file = os.path.join(dataset_path, 'contours.csv')
 		
 		if os.path.exists(contours_file):
@@ -39,3 +39,6 @@ class ContoursIO(ContoursBase):
 					contour = np.frombuffer(base64.decodestring(csvrow[1]), np.int32)
 					contour = contour.reshape(shape)
 					self.set_contour(frame, contour)
+
+
+		return data

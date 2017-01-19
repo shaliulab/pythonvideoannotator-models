@@ -1,13 +1,13 @@
 import os
-from pythonvideoannotator_models.models.imodel import IModel
+from pythonvideoannotator_models.models.video.objects.video_object import VideoObject
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.path import Path
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.contours import Contours
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.value import Value
 
-class Object2dBase(IModel):
+class Object2dBase(VideoObject):
 
 	def __init__(self, video):		
-		super(IModel, self).__init__()
+		super(Object2dBase, self).__init__()
 
 		self._video = video
 		self._video += self
@@ -53,10 +53,6 @@ class Object2dBase(IModel):
 	### PROPERTIES #######################################################
 	######################################################################
 
-	@property
-	def video(self): return self._video
-	@video.setter
-	def video(self, value): self._video = value
 
 	@property
 	def datasets(self): return self._datasets

@@ -69,8 +69,11 @@ class PathBase(Dataset):
 		if index >= len(self):
 			for i in range(len(self), index + 1): self._points.append(None)
 
-		# create a new moment in case it does not exists
-		self._points[index] = int(round(x)),int(round(y))
+		if x is None or y is None: 
+			self._points[index] = None
+		else:
+			# create a new moment in case it does not exists
+			self._points[index] = int(round(x)),int(round(y))
 
 	def set_data_from_blob(self,index, blob):
 		x, y = blob._centroid

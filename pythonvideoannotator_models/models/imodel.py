@@ -11,5 +11,5 @@ class IModel(object):
 	def directory(self): return None
 
 
-	def save(self, data, path):pass
-	def load(self, data, path):pass
+	def save(self, data, path): return data
+	def load(self, data, path): return data

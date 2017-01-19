@@ -3,6 +3,8 @@ from pythonvideoannotator_models.models.imodel import IModel
 
 class Dataset(IModel):
 
+	FACTORY_FUNCTION = ''
+
 	def __init__(self, object2d):		
 		super(IModel, self).__init__()
 
@@ -20,11 +22,14 @@ class Dataset(IModel):
 	def directory(self): return os.path.join( self.object2d.directory, 'datasets',self.name)
 
 
-	def save(self, data, datasets_path):
-		conf_path = os.path.join(self.directory, 'dataset.json')
+	
+
+	def save(self, data, path=None):
+		data['factory-function'] = self.FACTORY_FUNCTION
+		conf_path = os.path.join(path, 'dataset.json')
 		with open(conf_path, 'w') as outfile: json.dump(data, outfile)
-		return data
+		return super(Dataset, self).save(data, path)
 
-	def load(self, data, dataset_path):
-		pass
-
+	def load(self, data, path=None):
+		self.name = os.path.basename(path)
+		return super(Dataset, self).load(data, path)

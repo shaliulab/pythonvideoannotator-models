@@ -5,38 +5,38 @@ from pythonvideoannotator_models.utils.tools import list_folders_in_path
 
 class Object2dIO(Object2dBase):
 
+	FACTORY_FUNCTION = 'create_object'
+
 	######################################################################################
 	#### IO FUNCTIONS ####################################################################
 	######################################################################################
 
-	def save(self, data, project_path=None):
-		object_path = os.path.join(project_path, self.name)
-		if not os.path.exists(object_path): os.makedirs(object_path)
+	def save(self, data, object2d_path=None):
+		data = super(Object2dIO, self).save(data, object2d_path)
 
-		conf_path = os.path.join(self.object_path, 'dataset.json')
-		with open(conf_path, 'w') as outfile: json.dump({'factory-function':'create_geometry'}, outfile)
-		
-		datasets_path = os.path.join(object_path, 'datasets')
+		datasets_path = os.path.join(object2d_path, 'datasets')
 		if not os.path.exists(datasets_path): os.makedirs(datasets_path)
 		
 		datasets = []
 		for dataset in self._datasets:
-			data = dataset.save({}, datasets_path)
+			dataset_path = os.path.join(datasets_path, dataset.name)
+			if not os.path.exists(dataset_path): os.makedirs(dataset_path)
+			data = dataset.save({}, dataset_path)
 			datasets.append(dataset.directory)
 		
 		for dataset_path in list_folders_in_path(datasets_path):
 			if dataset_path not in datasets:
 				if os.path.exists(dataset_path):
 					send2trash(dataset_path)
-					
+
 		return data
 
-	def load(self, data, object_path=None):
-		dirname 		= os.path.basename(object_path)
-		name, extension = os.path.splitext(dirname)
-		self.name 		= name
+	def load(self, data, object2d_path=None):
+		data = super(Object2dIO, self).save(data, object2d_path)
+
+		dirname 		= os.path.basename(object2d_path)
 		
-		datasets_path = os.path.join(object_path, 'datasets')
+		datasets_path = os.path.join(object2d_path, 'datasets')
 		
 		for dataset_path in list_folders_in_path(datasets_path):
 			name		= os.path.basename(dataset_path)

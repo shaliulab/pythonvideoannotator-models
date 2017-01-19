@@ -3,9 +3,11 @@
 #from pythonvideoannotator_models.video.objects import Objects
 
 import cv2, os
+from pythonvideoannotator_models.models.video.objects.video_object import VideoObject
 from pythonvideoannotator_models.models.video.objects.object2d import Object2D
-from pythonvideoannotator_models.models.video.image import Image
-from pythonvideoannotator_models.models.video.geometry import Geometry
+from pythonvideoannotator_models.models.video.objects.image import Image
+from pythonvideoannotator_models.models.video.objects.geometry import Geometry
+from pythonvideoannotator_models.models.video.objects.note import Note
 from pythonvideoannotator_models.models.imodel import IModel
 
 
@@ -32,15 +34,17 @@ class VideoBase(IModel):
 	def __str__(self): return self.name
 
 	def __add__(self, obj):
-		if isinstance(obj, Object2D) or isinstance(obj, Image): self._childrens.append(obj)
+		if isinstance(obj, VideoObject): self._childrens.append(obj)
 		return self
 
 	def __sub__(self, obj):
-		if isinstance(obj, Object2D) or isinstance(obj, Image):  self._childrens.remove(obj)
+		if isinstance(obj, VideoObject):  self._childrens.remove(obj)
 		return self
 
 	def create_object(self): return Object2D(self)
 	def create_image(self):  return Image(self)
+	def create_geometry(self): return Geometry(self)
+	def create_note(self): return Note(self)
 
 	######################################################################################
 	#### PROPERTIES ######################################################################
@@ -60,6 +64,11 @@ class VideoBase(IModel):
 	def geometries(self): 
 		for child in self._childrens:
 			if isinstance(child, Geometry): yield child
+
+	@property
+	def notes(self): 
+		for child in self._childrens:
+			if isinstance(child, Note): yield child
 
 
 	@property

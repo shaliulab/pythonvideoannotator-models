@@ -3,16 +3,16 @@ from pythonvideoannotator_models.models.video.objects.object2d.datasets.value.va
 
 class ValueIO(ValueBase):
 
+	FACTORY_FUNCTION = 'create_value'
+
 	######################################################################################
 	#### IO FUNCTIONS ####################################################################
 	######################################################################################
 
-	def save(self, data, datasets_path=None):
-		if not os.path.exists(self.directory): os.makedirs(self.directory)
+	def save(self, data, dataset_path=None):
+		data = super(ValueIO, self).save(data, dataset_path)
 
-		data['factory-function'] = 'create_value'
-
-		dataset_file = os.path.join(self.directory, 'values.cvs')
+		dataset_file = os.path.join(dataset_path, 'values.cvs')
 		with open(dataset_file, 'w') as outfile:
 			outfile.write(';'.join(['frame','value'])+'\n' )
 			for index in range(len(self)):
@@ -21,10 +21,11 @@ class ValueIO(ValueBase):
 				outfile.write(';'.join( map(str,row) ))
 				outfile.write('\n')
 
-		super(ValueIO,self).save(data, datasets_path)
 		return data
 
 	def load(self, data, dataset_path=None):
+		data = super(ValueIO, self).load(data, dataset_path)
+
 		dataset_file = os.path.join(dataset_path, 'values.cvs')
 		
 		with open(dataset_file, 'r') as infile:
@@ -39,3 +40,5 @@ class ValueIO(ValueBase):
 				frame = int(csvrow[0])
 				value = eval(csvrow[1])
 				self.set_value(frame, value)
+
+		return data
