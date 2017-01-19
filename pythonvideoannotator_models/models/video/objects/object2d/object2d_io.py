@@ -13,6 +13,9 @@ class Object2dIO(Object2dBase):
 		object_path = os.path.join(project_path, self.name)
 		if not os.path.exists(object_path): os.makedirs(object_path)
 
+		conf_path = os.path.join(self.object_path, 'dataset.json')
+		with open(conf_path, 'w') as outfile: json.dump({'factory-function':'create_geometry'}, outfile)
+		
 		datasets_path = os.path.join(object_path, 'datasets')
 		if not os.path.exists(datasets_path): os.makedirs(datasets_path)
 		

@@ -5,6 +5,7 @@
 import cv2, os
 from pythonvideoannotator_models.models.video.objects.object2d import Object2D
 from pythonvideoannotator_models.models.video.image import Image
+from pythonvideoannotator_models.models.video.geometry import Geometry
 from pythonvideoannotator_models.models.imodel import IModel
 
 
@@ -54,6 +55,12 @@ class VideoBase(IModel):
 	def images(self): 
 		for child in self._childrens:
 			if isinstance(child, Image): yield child
+
+	@property
+	def geometries(self): 
+		for child in self._childrens:
+			if isinstance(child, Geometry): yield child
+
 
 	@property
 	def filepath(self): return self._filename
