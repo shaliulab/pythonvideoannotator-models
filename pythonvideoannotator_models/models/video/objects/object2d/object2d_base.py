@@ -6,13 +6,15 @@ from pythonvideoannotator_models.models.video.objects.object2d.datasets.value im
 
 class Object2dBase(VideoObject):
 
-	def __init__(self, video):		
+	def __init__(self, video):	
+		self._datasets   = []
+			
 		super(Object2dBase, self).__init__()
 
 		self._video = video
 		self._video += self
 
-		self._datasets   = []	
+			
 		self.name 		 = 'object({0})'.format(len(video)) if len(video)>0 else 'object'
 
 		

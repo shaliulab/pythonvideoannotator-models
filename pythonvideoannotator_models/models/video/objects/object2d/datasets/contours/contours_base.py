@@ -89,7 +89,10 @@ class ContoursBase(Dataset):
 		self._contours[index] = contour
 	
 	def set_data_from_blob(self,index, blob):
-		self.set_contour(index, blob._contour)
+		if blob is None:
+			self.set_contour(index, None)
+		else:
+			self.set_contour(index, blob._contour)
 
 
 	

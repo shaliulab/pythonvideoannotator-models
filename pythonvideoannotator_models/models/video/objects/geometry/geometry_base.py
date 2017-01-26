@@ -21,5 +21,10 @@ class GeometryBase(VideoObject):
 	######################################################################
 
 	def __str__(self): return self.name
+
+
+	@property
+	def geometry(self): return self._geometry
+	
 	
 	

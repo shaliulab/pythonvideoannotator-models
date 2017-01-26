@@ -51,7 +51,10 @@ class VideoBase(IModel):
 	######################################################################################
 
 	@property
-	def objects(self):
+	def objects(self): return self._childrens
+
+	@property
+	def objects2D(self):
 		for child in self._childrens:
 			if isinstance(child, Object2D): yield child
 

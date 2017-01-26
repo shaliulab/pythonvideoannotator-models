@@ -76,8 +76,11 @@ class PathBase(Dataset):
 			self._points[index] = int(round(x)),int(round(y))
 
 	def set_data_from_blob(self,index, blob):
-		x, y = blob._centroid
-		self.set_position(index, x, y)
+		if blob is None: 
+			self.set_position(index, None, None)
+		else:
+			x, y = blob._centroid
+			self.set_position(index, x, y)
 			
 
 	def collide_with_position(self, index, x, y, radius=20):
