@@ -1,1 +1,2 @@
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.contours.contours_io import ContoursIO as Contours
+from pythonvideoannotator_models.models.video.objects.object2d.datasets.contours.contours_base import points_angle

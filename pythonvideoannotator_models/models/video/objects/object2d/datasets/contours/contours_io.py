@@ -13,7 +13,8 @@ class ContoursIO(ContoursBase):
 			outfile.write(';'.join(['frame','contour','shape'])+'\n' )
 			for index in range(len(self)):
 				contour = self.get_contour(index)
-				row = [index] + ([None, None] if contour is None else [base64.b64encode(contour), contour.shape])
+				angle   = self.get_angle(index)
+				row = [index] + ([None, None] if contour is None else [base64.b64encode(contour), contour.shape, angle])
 				outfile.write(';'.join( map(str,row) ))
 				outfile.write('\n')
 
@@ -36,9 +37,11 @@ class ContoursIO(ContoursBase):
 					
 					frame = int(csvrow[0])
 					shape = eval(csvrow[2])
+					angle = eval(csvrow[3]) if len(csvrow)>3 else None
 					contour = np.frombuffer(base64.decodestring(csvrow[1]), np.int32)
 					contour = contour.reshape(shape)
-					self.set_contour(frame, contour)
+					
+					self.set_contour(frame, contour, angle)
 
 
 		return data
