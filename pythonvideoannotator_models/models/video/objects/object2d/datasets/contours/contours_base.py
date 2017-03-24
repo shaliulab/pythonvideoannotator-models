@@ -52,7 +52,10 @@ class ContoursBase(Dataset):
 		cnt = self.get_contour(index)
 		if cnt is None: return None
 		M = cv2.moments(cnt)
-		return int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])
+		if M["m00"]==0:
+			return None
+		else:
+			return int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])
 
 	def get_velocity(self, index):
 		p1 = self.get_position(index)
@@ -131,27 +134,30 @@ class ContoursBase(Dataset):
 		if angle is None:
 			p1, p2 = self.get_extreme_points(index)
 			centroid = self.get_position(index)
-			angle1  = points_angle(centroid,p1)
-			angle2  = points_angle(centroid,p2)
+			if centroid is not None:
+				angle1  = points_angle(centroid,p1)
+				angle2  = points_angle(centroid,p2)
 
-			# Search for the last angle
-			last_angle = None
-			for i in range(index-1, -1, -1):
-				tmp_angle = self._angles[i]
-				if tmp_angle is not None: 
-					last_angle = tmp_angle
-					break
+				# Search for the last angle
+				last_angle = None
+				for i in range(index-1, -1, -1):
+					tmp_angle = self._angles[i]
+					if tmp_angle is not None: 
+						last_angle = tmp_angle
+						break
 
-			# try to match the current angle with the last angle.
-			# angles cannot switch values drastically
-			if last_angle is not None:
-				diff1 = min_dist_angles(last_angle, angle1)
-				diff2 = min_dist_angles(last_angle, angle2)
-			
-				self._angles[index] = angle2 if diff1>diff2 else angle1
+				# try to match the current angle with the last angle.
+				# angles cannot switch values drastically
+				if last_angle is not None:
+					diff1 = min_dist_angles(last_angle, angle1)
+					diff2 = min_dist_angles(last_angle, angle2)
+				
+					self._angles[index] = angle2 if diff1>diff2 else angle1
+				else:
+					#print math.degrees(angle)
+					self._angles[index] = angle1
 			else:
-				#print math.degrees(angle)
-				self._angles[index] = angle1
+				self._angles[index] = angle
 		else:
 			self._angles[index] = angle
          
