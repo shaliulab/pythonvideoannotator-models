@@ -10,13 +10,13 @@ class ContoursIO(ContoursBase):
 
 		contours_file = os.path.join(dataset_path, 'contours.csv')
 		with open(contours_file, 'wb') as outfile:
-			outfile.write(';'.join(['frame','contour','shape'])+'\n' )
+			outfile.write((';'.join(['frame','contour','shape'])+'\n').encode( ))
 			for index in range(len(self)):
 				contour = self.get_contour(index)
 				angle   = self.get_angle(index)
 				row = [index] + ([None, None] if contour is None else [base64.b64encode(contour), contour.shape, angle])
-				outfile.write(';'.join( map(str,row) ))
-				outfile.write('\n')
+				outfile.write((';'.join( map(str,row) )).encode( ))
+				outfile.write(b'\n')
 
 		return data
 

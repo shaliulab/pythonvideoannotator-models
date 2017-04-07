@@ -15,12 +15,12 @@ class PathIO(PathBase):
 
 		dataset_file = os.path.join(dataset_path, 'path.cvs')
 		with open(dataset_file, 'w') as outfile:
-			outfile.write(';'.join(['frame','x','y'])+'\n' )
+			outfile.write((';'.join(['frame','x','y'])+'\n'))
 			for index in range(len(self)):
 				pos = self.get_position(index)
 				row = [index] + ([None, None] if pos is None else list(pos))
-				outfile.write(';'.join( map(str,row) ))
-				outfile.write('\n')
+				outfile.write((';'.join( map(str,row) )).encode( ))
+				outfile.write(b'\n')
 
 
 		super(PathIO,self).save(data, dataset_path)

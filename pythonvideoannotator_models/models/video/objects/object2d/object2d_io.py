@@ -1,4 +1,4 @@
-import os, json
+import os, simplejson as json
 from send2trash import send2trash
 from pythonvideoannotator_models.models.video.objects.object2d.object2d_base import Object2dBase
 from pythonvideoannotator_models.utils.tools import list_folders_in_path

@@ -14,12 +14,12 @@ class ValueIO(ValueBase):
 
 		dataset_file = os.path.join(dataset_path, 'values.cvs')
 		with open(dataset_file, 'w') as outfile:
-			outfile.write(';'.join(['frame','value'])+'\n' )
+			outfile.write((';'.join(['frame','value'])+'\n' ))
 			for index in range(len(self)):
 				val = self.get_value(index)
 				row = [index] + [val]
-				outfile.write(';'.join( map(str,row) ))
-				outfile.write('\n')
+				outfile.write((';'.join( map(str,row) )) )
+				outfile.write(b'\n')
 
 		return data
 

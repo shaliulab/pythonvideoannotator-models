@@ -1,6 +1,6 @@
 #! /usr/bin/python2
 # -*- coding: utf-8 -*-
-import os, json
+import os, simplejson as json
 from pysettings import conf
 from send2trash import send2trash
 from pythonvideoannotator.utils import tools
@@ -37,7 +37,8 @@ class ProjectIO(ProjectBase):
 
 		#Save the project file ######################################
 		project_filename = os.path.join(self.directory, 'project.json')
-		with open(project_filename, 'w') as outfile: json.dump(data, outfile)
+		with open(project_filename, 'w') as outfile: 
+			json.dump(data, outfile)
 
 		return data
 

@@ -27,6 +27,8 @@ def min_dist_angles(ang1, ang2):
 class ContoursBase(Dataset):
 
 	def __init__(self, object2d):
+		super(ContoursBase, self).__init__(object2d)
+		
 		self.object2d   = object2d
 		self.object2d   += self
 		self.name 		= 'contours({0})'.format(len(object2d)) if len(object2d)>0 else 'contours'

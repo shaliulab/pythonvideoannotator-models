@@ -1,4 +1,4 @@
-import os, json
+import os,simplejson as  json
 from pythonvideoannotator_models.models.imodel import IModel
 
 

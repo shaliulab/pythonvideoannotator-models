@@ -16,7 +16,7 @@ class NoteIO(NoteBase):
 		filepath = os.path.join(note_path, 'note.txt')
 		
 		with open(filepath, 'w') as outfile: 
-			outfile.write(self.note)
+			outfile.write((self.note))
 
 		return data
 

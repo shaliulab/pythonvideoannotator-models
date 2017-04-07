@@ -1,6 +1,6 @@
 #! /usr/bin/python2
 # -*- coding: utf-8 -*-
-import os, json
+import os,simplejson as  json
 from pysettings import conf
 from send2trash import send2trash
 from pythonvideoannotator_models.utils import tools

@@ -1,4 +1,4 @@
-import os, cv2, json
+import os, cv2, simplejson as json
 from send2trash import send2trash
 from pythonvideoannotator_models.models.video.objects.geometry.geometry_base import GeometryBase
 
@@ -15,7 +15,7 @@ class GeometryIO(GeometryBase):
 
 		filepath = os.path.join(geometry_path, 'data.geo')
 
-		with open(filepath, 'wb') as outfile: 
+		with open(filepath, 'w') as outfile: 
 			json.dump(self._geometry, outfile)
 		
 		return data
