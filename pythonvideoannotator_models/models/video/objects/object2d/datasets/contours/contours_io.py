@@ -26,10 +26,10 @@ class ContoursIO(ContoursBase):
 		contours_file = os.path.join(dataset_path, 'contours.csv')
 		
 		if os.path.exists(contours_file):
-			with open(contours_file, 'r') as infile:
+			with open(contours_file, 'rb') as infile:
 				infile.readline()
 				for i, line in enumerate(infile):
-					csvrow = line[:-1].split(';')
+					csvrow = line[:-1].split(b';')
 					
 					if csvrow[1] is None or csvrow[2] is None: 		continue
 					if len(csvrow[1])==0 or len(csvrow[2])==0: 		continue
@@ -38,7 +38,10 @@ class ContoursIO(ContoursBase):
 					frame = int(csvrow[0])
 					shape = eval(csvrow[2])
 					angle = eval(csvrow[3]) if len(csvrow)>3 else None
-					contour = np.frombuffer(base64.decodestring(csvrow[1]), np.int32)
+					
+					contourbytes = eval(csvrow[1])
+					buf = base64.b64decode(contourbytes)
+					contour = np.frombuffer(buf, np.int32)
 					contour = contour.reshape(shape)
 					
 					self.set_contour(frame, contour, angle)

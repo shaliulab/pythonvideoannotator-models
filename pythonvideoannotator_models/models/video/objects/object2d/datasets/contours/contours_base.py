@@ -30,7 +30,6 @@ class ContoursBase(Dataset):
 		super(ContoursBase, self).__init__(object2d)
 		
 		self.object2d   = object2d
-		self.object2d   += self
 		self.name 		= 'contours({0})'.format(len(object2d)) if len(object2d)>0 else 'contours'
 		self._contours 	= []
 		self._angles 	= []
@@ -93,11 +92,11 @@ class ContoursBase(Dataset):
 		contour  = self.get_contour(index)
 
 		if centroid is not None and contour is not None:
-			dists = map( lambda p: self.__lin_dist( p[0], centroid ), contour )
+			dists = list(map( lambda p: self.__lin_dist( p[0], centroid ), contour ))
 			ndx = dists.index(max(dists))			
 			head = tuple(contour[ndx][0])
 			
-			dists = map( lambda p: self.__lin_dist( p[0], contour[ndx][0] ), contour )
+			dists = list(map( lambda p: self.__lin_dist( p[0], contour[ndx][0] ), contour ))
 			ndx = dists.index(max(dists))
 			tail = tuple(contour[ndx][0])
 

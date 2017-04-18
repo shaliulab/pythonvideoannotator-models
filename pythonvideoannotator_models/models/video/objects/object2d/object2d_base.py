@@ -24,9 +24,9 @@ class Object2dBase(VideoObject):
 	### OBJECT FUNCTIONS #################################################
 	######################################################################
 
-	def create_path(self): return Path(self)
-	def create_contours(self): return Contours(self)
-	def create_value(self): return Value(self)
+	def create_path(self): 		return Path(self)
+	def create_contours(self): 	return Contours(self)
+	def create_value(self): 	return Value(self)
 
 		
 	######################################################################

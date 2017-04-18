@@ -1,4 +1,4 @@
-import cv2, math, os
+import cv2, math, os, numpy as np
 from pythonvideoannotator_models.models.video.objects.object2d.utils.interpolation import interpolate_positions
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.dataset import Dataset
 
@@ -20,9 +20,11 @@ class PathBase(Dataset):
 	### CLASS FUNCTIONS ##################################################
 	######################################################################
 
-	def __len__(self): 				return len(self._points)
-	def __getitem__(self, index): 	return self._points[index] if index<len(self) else None
-	def __str__(self):				return self.name
+	def __len__(self): 					 return len(self._points)
+	def __getitem__(self, index): 		 return self._points[index] if index<len(self) else None
+	def __setitem__(self, index, value): 
+		if index<len(self): self._points[index] = None
+	def __str__(self):					 return self.name
 
 	######################################################################
 	### DATA MODIFICATION AND ACCESS #####################################
@@ -37,7 +39,7 @@ class PathBase(Dataset):
 		self._tmp_points= [pos for frame, pos in positions]
 
 	def delete_range(self, begin, end):
-		for index in range(begin, end):
+		for index in range(begin, end-1):
 			if index <= len(self) and self[index] != None: self[index] = None
 			self._tmp_points= []
 
@@ -102,15 +104,14 @@ class PathBase(Dataset):
 			cv2.putText(frame, str(frame_index), position[:2], cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), thickness=1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
 
 	def draw_position(self, frame, frame_index):
-		position = self.get_position(frame_index)
-
-		if position != None:
-			cv2.circle(frame, position[:2], 5, (255, 255, 255), -1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
-			cv2.circle(frame, position[:2], 3, (255, 0, 255), -1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
+		pos = self.get_position(frame_index)
+		if pos is None: return
+		
+		cv2.circle(frame, pos, 8, (255,255,255), -1, lineType=cv2.LINE_AA)
+		cv2.circle(frame, pos, 6, (100,0,100), 	 -1, lineType=cv2.LINE_AA)
 
 
 	def draw(self, frame, frame_index):
-
 		self.draw_position(frame, frame_index)
 
 		# Draw the selected blobs
@@ -121,19 +122,13 @@ class PathBase(Dataset):
 		if 1 <= len(self._sel_pts) == 2: #store a temporary path for interpolation visualization
 			start = self._sel_pts[0] #store a temporary path for interpolation visualization
 			end = frame_index if len(self._sel_pts)==1 else self._sel_pts[1]
-			for i in range(start, end - 1):
-				v1 = self[i]
-				v2 = self[i + 1]
-				if v1 != None and v2 != None:
-					cv2.line(frame, v1, v2, (0, 0, 255), 1)
-
+			cnt = np.int32([p for p in self._points[start:end] if p is not None])
+			cv2.polylines(frame, [cnt], False, (0,0,255), 1, lineType=cv2.LINE_AA)
+		
 		# Draw a temporary path
-		for i in range(len(self._tmp_points) - 1):
-			p1 = self._tmp_points[i]
-			p2 = self._tmp_points[i + 1]
-			p1 = (int(p1[0]), int(p1[1]))
-			p2 = (int(p2[0]), int(p2[1]))
-			cv2.line(frame, p1, p2, (255, 0, 0), 1)
+		if len(self._tmp_points)>=2:
+			cnt = np.int32(self._tmp_points)
+			cv2.polylines(frame, [cnt], False, (255, 0, 0), 1, lineType=cv2.LINE_AA)
 
 
 	######################################################################
