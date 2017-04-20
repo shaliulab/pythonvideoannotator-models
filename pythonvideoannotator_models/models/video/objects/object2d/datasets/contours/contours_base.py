@@ -7,7 +7,7 @@ def points_angle(p1, p2):
 	x2, y2 = p2
 	rads = math.atan2(y2-y1,x2-x1)
 	#rads %= 2*np.pi
-	return math.degrees(rads)
+	return rads
 """
 def points_angle(p1, p2):
     ang1 = np.arctan2(*p1[::-1])
@@ -21,7 +21,7 @@ def min_dist_angles(ang1, ang2):
     angle1 = abs(ang1-ang2)
     angle2 = abs(ang1-(np.pi*2)-ang2)
     angle3 = abs(ang1+(np.pi*2)-ang2)
-    return math.degrees(min(angle1, angle2, angle3))
+    return min(angle1, angle2, angle3)
   
 
 class ContoursBase(Dataset):
@@ -120,6 +120,8 @@ class ContoursBase(Dataset):
 
 	def get_angular_velocity(self, index):
 		a1 = self.get_angle(index)
+		a2 = self.get_angle(index+1)
+		return min_dist_angles(a1, a2) if (a1 is not None and a2 is not None) else None
 
 	def get_contour(self, index):
 		if index<0 or index>=len(self._contours): return None
