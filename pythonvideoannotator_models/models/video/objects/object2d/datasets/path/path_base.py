@@ -34,13 +34,17 @@ class PathBase(Dataset):
 		#store a temporary path to visualize the interpolation 
 		begin 		= self._sel_pts[0]
 		end 		= self._sel_pts[1]
-		positions 	= [[i, self.get_position(i)] for i in range(begin, end + 1) if self.get_position(i) is not None]
-		if len(positions)>2:
+		positions 	= [[i, self.get_position(i)] for i in range(begin, end+1) if self.get_position(i) is not None]
+
+		if len(positions)>=2:
 			positions   = interpolate_positions(positions, begin, end, interpolation_mode=self.interpolation_mode)
 			self._tmp_points= [pos for frame, pos in positions]
+			return True
+		else:
+			return False
 
 	def delete_range(self, begin, end):
-		for index in range(begin, end-1):
+		for index in range(begin+1, end):
 			if index <= len(self) and self[index] != None: self[index] = None
 			self._tmp_points= []
 
