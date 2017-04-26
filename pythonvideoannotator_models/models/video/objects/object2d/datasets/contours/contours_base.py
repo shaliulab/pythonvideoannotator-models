@@ -2,26 +2,7 @@ import cv2, math, os, numpy as np
 from pythonvideoannotator_models.models.video.objects.object2d.utils.interpolation import interpolate_positions
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.dataset import Dataset
 
-def points_angle(p1, p2): 
-	x1, y1 = p1
-	x2, y2 = p2
-	rads = math.atan2(y2-y1,x2-x1)
-	#rads %= 2*np.pi
-	return rads
-"""
-def points_angle(p1, p2):
-    ang1 = np.arctan2(*p1[::-1])
-    ang2 = np.arctan2(*p2[::-1])
-    return (ang1 - ang2) % (2 * np.pi)"""
-
-def min_dist_angles(ang1, ang2):
-    tmp = max(ang1, ang2)
-    ang2 = min(ang1, ang2)
-    ang1 = tmp
-    angle1 = abs(ang1-ang2)
-    angle2 = abs(ang1-(np.pi*2)-ang2)
-    angle3 = abs(ang1+(np.pi*2)-ang2)
-    return min(angle1, angle2, angle3)
+from pythonvideoannotator.utils.tools import points_angle, min_dist_angles
   
 
 class ContoursBase(Dataset):
@@ -132,6 +113,9 @@ class ContoursBase(Dataset):
 		if index >= len(self._contours):
 			for i in range(len(self._contours), index + 1): 
 				self._contours.append(None)
+
+		if index >= len(self._angles):
+			for i in range(len(self._angles), index + 1): 
 				self._angles.append(None)
 
 		self._contours[index] = contour
@@ -174,6 +158,12 @@ class ContoursBase(Dataset):
 			self.set_contour(index, blob._contour)
 
 
+	def set_angle(self, index, angle):
+		if index >= len(self._angles):
+			for i in range(len(self._angles), index + 1): 
+				self._angles.append(None)
+
+		self._angles[index] = angle
 	
 	
 	
