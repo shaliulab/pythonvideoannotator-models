@@ -35,8 +35,9 @@ class PathBase(Dataset):
 		begin 		= self._sel_pts[0]
 		end 		= self._sel_pts[1]
 		positions 	= [[i, self.get_position(i)] for i in range(begin, end + 1) if self.get_position(i) is not None]
-		positions   = interpolate_positions(positions, begin, end, interpolation_mode=self.interpolation_mode)
-		self._tmp_points= [pos for frame, pos in positions]
+		if len(positions)>2:
+			positions   = interpolate_positions(positions, begin, end, interpolation_mode=self.interpolation_mode)
+			self._tmp_points= [pos for frame, pos in positions]
 
 	def delete_range(self, begin, end):
 		for index in range(begin, end-1):
@@ -45,9 +46,10 @@ class PathBase(Dataset):
 
 	def interpolate_range(self, begin, end, interpolation_mode=None):
 		positions = [[i, self.get_position(i)] for i in range(begin, end+1) if self.get_position(i) is not None]
-		positions = interpolate_positions(positions, begin, end, interpolation_mode)
-		for frame, pos in positions: self.set_position(frame, pos[0], pos[1])
-		self._tmp_points= []
+		if len(positions)>2:
+			positions = interpolate_positions(positions, begin, end, interpolation_mode)
+			for frame, pos in positions: self.set_position(frame, pos[0], pos[1])
+			self._tmp_points= []
 
 	def get_velocity(self, index):
 		p1 = self.get_position(index)
