@@ -1,5 +1,5 @@
 from pythonvideoannotator_models.models.video.objects.video_object import VideoObject
-
+import numpy as np
 
 class GeometryBase(VideoObject):
 
@@ -15,6 +15,15 @@ class GeometryBase(VideoObject):
 	######################################################################
 	### OBJECT FUNCTIONS #################################################
 	######################################################################
+
+	def create_contours(self, object2d):
+		if len(self._geometry)==0: return
+		contours = object2d.create_contours()
+		begin    = 0
+
+		contour = np.int32([self._geometry[0][1]])
+		for index in range( int(self._video.total_frames) ):
+			contours.set_contour(index, contour)
 		
 	######################################################################
 	### CLASS FUNCTIONS ##################################################

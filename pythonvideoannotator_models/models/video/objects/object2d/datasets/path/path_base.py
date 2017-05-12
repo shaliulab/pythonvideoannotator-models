@@ -87,7 +87,7 @@ class PathBase(Dataset):
 		if blob is None: 
 			self.set_position(index, None, None)
 		else:
-			x, y = blob._centroid
+			x, y = blob.centroid
 			self.set_position(index, x, y)
 			
 

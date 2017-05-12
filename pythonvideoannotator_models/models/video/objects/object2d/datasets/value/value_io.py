@@ -13,12 +13,12 @@ class ValueIO(ValueBase):
 		data = super(ValueIO, self).save(data, dataset_path)
 
 		dataset_file = os.path.join(dataset_path, 'values.cvs')
-		with open(dataset_file, 'w') as outfile:
-			outfile.write((';'.join(['frame','value'])+'\n' ))
+		with open(dataset_file, 'wb') as outfile:
+			outfile.write((';'.join(['frame','value'])+'\n' ).encode( ))
 			for index in range(len(self)):
 				val = self.get_value(index)
 				row = [index] + [val]
-				outfile.write((';'.join( map(str,row) )) )
+				outfile.write((';'.join( map(str,row) )).encode( ) )
 				outfile.write(b'\n')
 
 		return data
@@ -28,10 +28,10 @@ class ValueIO(ValueBase):
 
 		dataset_file = os.path.join(dataset_path, 'values.cvs')
 		
-		with open(dataset_file, 'r') as infile:
+		with open(dataset_file, 'rb') as infile:
 			infile.readline()
 			for i, line in enumerate(infile):
-				csvrow = line[:-1].split(';')
+				csvrow = line[:-1].split(b';')
 
 				if csvrow[1] is None: continue
 				if len(csvrow[1])==0: continue
