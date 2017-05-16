@@ -43,5 +43,4 @@ class PathIO(PathBase):
 				frame, x, y = int(csvrow[0]), int(csvrow[1]), int(csvrow[2])
 				self.set_position(frame, x, y)
 
-
 		return data

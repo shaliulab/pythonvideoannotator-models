@@ -51,11 +51,13 @@ class VideoIO(VideoBase):
 		objects_dirs = tools.list_folders_in_path(objects_path)
 
 		for obj_dir in objects_dirs:
+			name		= os.path.basename(obj_dir)
 			conf_path 	= os.path.join(obj_dir, 'dataset.json')
 			with open(conf_path, 'r') as infile:
 				dataset_conf 	= json.load(infile)
 				func 			= getattr(self, dataset_conf['factory-function'])
 				dataset 		= func()
 				dataset.load(data, obj_dir)
+				dataset.name    = name
 
 		super(VideoIO, self).load(data, video_path)

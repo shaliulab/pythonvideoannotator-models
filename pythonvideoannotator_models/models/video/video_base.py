@@ -41,10 +41,10 @@ class VideoBase(IModel):
 		if isinstance(obj, VideoObject):  self._childrens.remove(obj)
 		return self
 
-	def create_object(self): return Object2D(self)
-	def create_image(self):  return Image(self)
-	def create_geometry(self): return Geometry(self)
-	def create_note(self): return Note(self)
+	def create_object(self): 	return Object2D(self)
+	def create_image(self):  	return Image(self)
+	def create_geometry(self): 	return Geometry(self)
+	def create_note(self): 		return Note(self)
 
 	######################################################################################
 	#### PROPERTIES ######################################################################

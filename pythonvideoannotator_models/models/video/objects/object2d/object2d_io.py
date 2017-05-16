@@ -34,7 +34,7 @@ class Object2dIO(Object2dBase):
 	def load(self, data, object2d_path=None):
 		data = super(Object2dIO, self).save(data, object2d_path)
 
-		dirname 		= os.path.basename(object2d_path)
+		dirname = os.path.basename(object2d_path)
 		
 		datasets_path = os.path.join(object2d_path, 'datasets')
 		
