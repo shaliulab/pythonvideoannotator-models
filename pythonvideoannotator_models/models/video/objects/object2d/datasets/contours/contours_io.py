@@ -40,11 +40,13 @@ class ContoursIO(ContoursBase):
 					angle = eval(csvrow[3]) if len(csvrow)>3 else None
 					
 					contourbytes = eval(csvrow[1])
-					buf = base64.b64decode(contourbytes)
-					contour = np.frombuffer(buf, np.int32)
-					contour = contour.reshape(shape)
-					
-					self.set_contour(frame, contour, angle)
+					if contourbytes is not None:
+						buf = base64.b64decode(contourbytes)
+						contour = np.frombuffer(buf, np.int32)
+						contour = contour.reshape(shape)
+						self.set_contour(frame, contour, angle)
+					else:
+						self.set_contour(frame, None, None)
 
 
 		return data
