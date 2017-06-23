@@ -38,7 +38,7 @@ class PathIO(PathBase):
 
 				if csvrow[1] is None or csvrow[2] is None: 		continue
 				if len(csvrow[1])==0 or len(csvrow[2])==0: 		continue
-				if csvrow[1] == 'None' or csvrow[2] == 'None': 	continue
+				if csvrow[1] == b'None' or csvrow[2] == b'None':continue
 				
 				frame, x, y = int(csvrow[0]), int(csvrow[1]), int(csvrow[2])
 				self.set_position(frame, x, y)

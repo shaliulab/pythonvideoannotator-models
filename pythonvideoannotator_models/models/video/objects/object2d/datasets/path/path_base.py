@@ -116,6 +116,13 @@ class PathBase(Dataset):
 		cv2.circle(frame, pos, 8, (255,255,255), -1, lineType=cv2.LINE_AA)
 		cv2.circle(frame, pos, 6, (100,0,100), 	 -1, lineType=cv2.LINE_AA)
 
+	def draw_path(self,frame, start=None, end=None):
+		# Draw the selected path #store a temporary path for interpolation visualization
+		points = self._points
+		if end:   points = points[:end]
+		if start: points = points[start:]
+		cnt = np.int32([p for p in points if p is not None])
+		cv2.polylines(frame, [cnt], False, (0,0,255), 1, lineType=cv2.LINE_AA)
 
 	def draw(self, frame, frame_index):
 		self.draw_position(frame, frame_index)
@@ -124,13 +131,11 @@ class PathBase(Dataset):
 		for item in self._sel_pts: #store a temporary path for interpolation visualization
 			self.draw_circle(frame, item)
 
-		# Draw the selected path #store a temporary path for interpolation visualization
 		if 1 <= len(self._sel_pts) == 2: #store a temporary path for interpolation visualization
 			start = self._sel_pts[0] #store a temporary path for interpolation visualization
 			end = frame_index if len(self._sel_pts)==1 else self._sel_pts[1]
-			cnt = np.int32([p for p in self._points[start:end] if p is not None])
-			cv2.polylines(frame, [cnt], False, (0,0,255), 1, lineType=cv2.LINE_AA)
-		
+			self.draw_path(frame, start, end)
+
 		# Draw a temporary path
 		if len(self._tmp_points)>=2:
 			cnt = np.int32(self._tmp_points)

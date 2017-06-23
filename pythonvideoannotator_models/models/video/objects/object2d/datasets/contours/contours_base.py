@@ -58,7 +58,7 @@ class ContoursBase(Dataset):
 		
 	def get_fit_ellipse(self, index):
 		cnt = self.get_contour(index)
-		if cnt is None: return None
+		if cnt is None or len(cnt)<5: return None
 		return cv2.fitEllipse(cnt)
 		
 	def get_convex_hull(self, index):
@@ -94,6 +94,8 @@ class ContoursBase(Dataset):
 			return head, tail
 		else:
 			return None, None
+
+	def draw_path(frame, start=None, end=None): pass
 
 	def get_angle(self, index):
 		if index<0 or index>=len(self._angles): return None

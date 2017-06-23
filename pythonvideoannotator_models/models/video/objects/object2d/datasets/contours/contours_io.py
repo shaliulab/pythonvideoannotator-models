@@ -33,7 +33,7 @@ class ContoursIO(ContoursBase):
 					
 					if csvrow[1] is None or csvrow[2] is None: 		continue
 					if len(csvrow[1])==0 or len(csvrow[2])==0: 		continue
-					if csvrow[1] == 'None' or csvrow[2] == 'None': 	continue
+					if csvrow[1] == b'None' or csvrow[2] == b'None': continue
 					
 					frame = int(csvrow[0])
 					shape = eval(csvrow[2])
