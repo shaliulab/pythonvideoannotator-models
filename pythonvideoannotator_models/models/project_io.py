@@ -3,7 +3,7 @@
 import os, simplejson as json
 from pysettings import conf
 from send2trash import send2trash
-from pythonvideoannotator.utils import tools
+from pythonvideoannotator_models.utils import tools
 from pythonvideoannotator_models.models.project_base import ProjectBase
 
 class ProjectIO(ProjectBase):
