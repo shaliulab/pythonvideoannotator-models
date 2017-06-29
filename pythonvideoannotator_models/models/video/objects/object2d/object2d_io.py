@@ -47,4 +47,4 @@ class Object2dIO(Object2dBase):
 				func = getattr(self, dataset_conf['factory-function'])
 				dataset = func()
 				dataset.name = name
-				dataset.load(data, dataset_path)
+				dataset.load(dataset_conf, dataset_path)

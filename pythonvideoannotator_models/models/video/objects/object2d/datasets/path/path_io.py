@@ -11,25 +11,25 @@ class PathIO(PathBase):
 	######################################################################################
 
 	def save(self, data, dataset_path=None):
-		data = super(PathIO, self).save(data, dataset_path)
+		#data = super(PathIO, self).save(data, dataset_path)
 
 		dataset_file = os.path.join(dataset_path, 'path.cvs')
 		with open(dataset_file, 'wb') as outfile:
 			outfile.write((';'.join(['frame','x','y'])+'\n').encode())
 			for index in range(len(self)):
-				pos = self.get_position(index)
+				pos = self.get_position(index, use_reference=False)
 				row = [index] + ([None, None] if pos is None else list(pos))
 				outfile.write((';'.join( map(str,row) )).encode( ))
 				outfile.write(b'\n')
 
-
+		data['reference-point'] = self.reference
 		super(PathIO,self).save(data, dataset_path)
 		return data
 
 	def load(self, data, dataset_path=None):
 		data = super(PathIO, self).load(data, dataset_path)
-
-		dataset_file = os.path.join(dataset_path, 'path.cvs')
+		
+		dataset_file = os.path.join(dataset_path, 'path.cvs')	
 
 		with open(dataset_file, 'rb') as infile:
 			infile.readline()
@@ -43,4 +43,5 @@ class PathIO(PathBase):
 				frame, x, y = int(csvrow[0]), int(csvrow[1]), int(csvrow[2])
 				self.set_position(frame, x, y)
 
+		self.reference = data.get('reference-point', None)
 		return data

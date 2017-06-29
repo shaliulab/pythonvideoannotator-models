@@ -10,7 +10,9 @@ class PathBase(Dataset):
 		super(PathBase, self).__init__(object2d)
 
 		self.name 		= 'path({0})'.format(len(object2d))  if len(object2d)>0 else 'path'
-		self._points 	= [] #path of the object
+
+		self._reference = 0,0 #point to be use as reference point to the path
+		self._points 	= []  #path of the object
 
 		self._tmp_points= [] #store a temporary path to pre-visualize de interpolation
 		self._sel_pts 	= [] #store the selected points
@@ -21,9 +23,8 @@ class PathBase(Dataset):
 	######################################################################
 
 	def __len__(self): 					 return len(self._points)
-	def __getitem__(self, index): 		 return self._points[index] if index<len(self) else None
-	def __setitem__(self, index, value): 
-		if index<len(self): self._points[index] = None
+	def __getitem__(self, index): 		 return self.get_position(index)
+	def __setitem__(self, index, value): self.set_position(index, value[0], value[1])
 	def __str__(self):					 return self.name
 
 	######################################################################
@@ -68,9 +69,17 @@ class PathBase(Dataset):
 		if v1 is None or v2 is None: return None
 		return v2[0]-v1[0], v2[1]-v1[1]
 
-	def get_position(self, index):
+	def get_position(self, index, use_reference=True):
 		if index<0 or index>=len(self): return None
-		return self[index] if self[index] is not None else None
+		if use_reference and self._reference:
+			if self._points[index]:
+				p = self._points[index]
+				r = self._reference
+				return p[0]-r[0], p[1]-r[1]
+			else:
+				return None
+		else:
+			return self._points[index]
 
 	def set_position(self, index, x, y):
 		# add positions in case they do not exists
@@ -127,6 +136,10 @@ class PathBase(Dataset):
 	def draw(self, frame, frame_index):
 		self.draw_position(frame, frame_index)
 
+		if self._reference:
+			cv2.circle(frame, self._reference, 8, (0,255,0), -1, lineType=cv2.LINE_AA)
+			cv2.circle(frame, self._reference, 6, (100,0,100), 	 -1, lineType=cv2.LINE_AA)
+
 		# Draw the selected blobs
 		for item in self._sel_pts: #store a temporary path for interpolation visualization
 			self.draw_circle(frame, item)
@@ -148,3 +161,9 @@ class PathBase(Dataset):
 
 	@property
 	def interpolation_mode(self): return None
+
+	@property
+	def reference(self): return self._reference
+
+	@reference.setter
+	def reference(self, value): self._reference = value
