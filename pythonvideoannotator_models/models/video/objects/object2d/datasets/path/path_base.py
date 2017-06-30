@@ -11,7 +11,8 @@ class PathBase(Dataset):
 
 		self.name 		= 'path({0})'.format(len(object2d))  if len(object2d)>0 else 'path'
 
-		self._reference = 0,0 #point to be use as reference point to the path
+		self._apply_referencial = False
+		self._referencial 		= None #point to be use as reference point to the path
 		self._points 	= []  #path of the object
 
 		self._tmp_points= [] #store a temporary path to pre-visualize de interpolation
@@ -30,6 +31,14 @@ class PathBase(Dataset):
 	######################################################################
 	### DATA MODIFICATION AND ACCESS #####################################
 	######################################################################
+
+	def clone_path(self):
+		path 				   = self.object2d.create_path()
+		path.name 			   = self.name + ' (copy {0})'.format(len(self.object2d))
+		path._points 		   = list(self._points)
+		path.referencial   	   = self.referencial if self.referencial else None
+		path.apply_referencial = self.apply_referencial
+		return path
 
 	def calculate_tmp_interpolation(self): 
 		#store a temporary path to visualize the interpolation 
@@ -69,12 +78,14 @@ class PathBase(Dataset):
 		if v1 is None or v2 is None: return None
 		return v2[0]-v1[0], v2[1]-v1[1]
 
-	def get_position(self, index, use_reference=True):
+	def get_position(self, index, use_referencial=True):
 		if index<0 or index>=len(self): return None
-		if use_reference and self._reference:
+
+		#In case the referencial is active
+		if use_referencial and self.apply_referencial and self.referencial:
 			if self._points[index]:
 				p = self._points[index]
-				r = self._reference
+				r = self.referencial
 				return p[0]-r[0], p[1]-r[1]
 			else:
 				return None
@@ -136,9 +147,9 @@ class PathBase(Dataset):
 	def draw(self, frame, frame_index):
 		self.draw_position(frame, frame_index)
 
-		if self._reference:
-			cv2.circle(frame, self._reference, 8, (0,255,0), -1, lineType=cv2.LINE_AA)
-			cv2.circle(frame, self._reference, 6, (100,0,100), 	 -1, lineType=cv2.LINE_AA)
+		if self.referencial:
+			cv2.circle(frame, self.referencial, 8, (0,255,0), -1, lineType=cv2.LINE_AA)
+			cv2.circle(frame, self.referencial, 6, (100,0,100), -1, lineType=cv2.LINE_AA)
 
 		# Draw the selected blobs
 		for item in self._sel_pts: #store a temporary path for interpolation visualization
@@ -163,7 +174,11 @@ class PathBase(Dataset):
 	def interpolation_mode(self): return None
 
 	@property
-	def reference(self): return self._reference
+	def referencial(self): return self._referencial
+	@referencial.setter
+	def referencial(self, value): self._referencial = value
 
-	@reference.setter
-	def reference(self, value): self._reference = value
+	@property
+	def apply_referencial(self):  return self._apply_referencial
+	@apply_referencial.setter
+	def apply_referencial(self, value): self._apply_referencial = value

@@ -17,12 +17,16 @@ class PathIO(PathBase):
 		with open(dataset_file, 'wb') as outfile:
 			outfile.write((';'.join(['frame','x','y'])+'\n').encode())
 			for index in range(len(self)):
-				pos = self.get_position(index, use_reference=False)
+				pos = self.get_position(index, use_referencial=False)
 				row = [index] + ([None, None] if pos is None else list(pos))
 				outfile.write((';'.join( map(str,row) )).encode( ))
 				outfile.write(b'\n')
 
-		data['reference-point'] = self.reference
+		# save the referencial data
+		data['apply-referencial'] = self.apply_referencial
+		data['referencial-point'] = self.referencial
+
+
 		super(PathIO,self).save(data, dataset_path)
 		return data
 
@@ -43,5 +47,9 @@ class PathIO(PathBase):
 				frame, x, y = int(csvrow[0]), int(csvrow[1]), int(csvrow[2])
 				self.set_position(frame, x, y)
 
-		self.reference = data.get('reference-point', None)
+		# load the referencial data
+		ref 					= data.get('referencial-point', None)
+		self.referencial 		= tuple(ref) if ref else None
+		self.apply_referencial  = data.get('apply-referencial', False)
+
 		return data
