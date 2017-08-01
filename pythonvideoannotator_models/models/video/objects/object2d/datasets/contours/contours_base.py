@@ -112,15 +112,15 @@ class ContoursBase(Dataset):
 
 	def set_contour(self, index, contour, angle=None):
 
-		if contour is not None:
-			# add contours in case they do not exists
-			if index >= len(self._contours):
-				for i in range(len(self._contours), index + 1): 
-					self._contours.append(None)
+		
+		# add contours in case they do not exists
+		if index >= len(self._contours):
+			for i in range(len(self._contours), index + 1): 
+				self._contours.append(None)
 
-			if index >= len(self._angles):
-				for i in range(len(self._angles), index + 1): 
-					self._angles.append(None)
+		if index >= len(self._angles):
+			for i in range(len(self._angles), index + 1): 
+				self._angles.append(None)
 
 		self._contours[index] = contour
 
