@@ -111,14 +111,16 @@ class ContoursBase(Dataset):
 		return self._contours[index] if self._contours[index] is not None else None
 
 	def set_contour(self, index, contour, angle=None):
-		# add contours in case they do not exists
-		if index >= len(self._contours):
-			for i in range(len(self._contours), index + 1): 
-				self._contours.append(None)
 
-		if index >= len(self._angles):
-			for i in range(len(self._angles), index + 1): 
-				self._angles.append(None)
+		if contour is not None:
+			# add contours in case they do not exists
+			if index >= len(self._contours):
+				for i in range(len(self._contours), index + 1): 
+					self._contours.append(None)
+
+			if index >= len(self._angles):
+				for i in range(len(self._angles), index + 1): 
+					self._angles.append(None)
 
 		self._contours[index] = contour
 
@@ -154,6 +156,7 @@ class ContoursBase(Dataset):
 			self._angles[index] = angle
          
 	def set_data_from_blob(self,index, blob):
+		print('set_data_from_blob', index, blob)
 		if blob is None:
 			self.set_contour(index, None)
 		else:
