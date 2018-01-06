@@ -46,6 +46,11 @@ class VideoBase(IModel):
 	def create_geometry(self): 	return Geometry(self)
 	def create_note(self): 		return Note(self)
 
+	def find_object2d(self, name):
+		for o in self.objects:
+			if o.name == name: return o
+		return None
+
 	######################################################################################
 	#### PROPERTIES ######################################################################
 	######################################################################################

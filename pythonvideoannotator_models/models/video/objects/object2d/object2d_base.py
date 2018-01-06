@@ -27,6 +27,10 @@ class Object2dBase(VideoObject):
 	def create_contours(self): 	return Contours(self)
 	def create_value(self): 	return Value(self)
 
+	def find_dataset(self, name):
+		for o in self.datasets:
+			if o.name == name: return o
+		return None
 		
 	######################################################################
 	### CLASS FUNCTIONS ##################################################

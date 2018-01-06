@@ -2,7 +2,7 @@ import cv2, math, os, numpy as np
 from pythonvideoannotator_models.models.video.objects.object2d.utils.interpolation import interpolate_positions
 from pythonvideoannotator_models.models.video.objects.object2d.datasets.dataset import Dataset
 
-from pythonvideoannotator.utils.tools import points_angle, min_dist_angles
+from pythonvideoannotator_models.utils.tools import points_angle, min_dist_angles
   
 
 class ContoursBase(Dataset):
@@ -156,7 +156,6 @@ class ContoursBase(Dataset):
 			self._angles[index] = angle
          
 	def set_data_from_blob(self,index, blob):
-		print('set_data_from_blob', index, blob)
 		if blob is None:
 			self.set_contour(index, None)
 		else:

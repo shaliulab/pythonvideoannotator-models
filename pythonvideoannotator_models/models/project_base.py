@@ -26,6 +26,11 @@ class ProjectBase(IModel):
 
 	def create_video(self): return Video(self)
 
+	def find_video(self, name):
+		for o in self.videos:
+			if o.name == name: return o
+		return None
+
 	######################################################################################
 	#### PROPERTIES ######################################################################
 	######################################################################################

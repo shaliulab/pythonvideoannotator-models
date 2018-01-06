@@ -12,7 +12,7 @@ class ProjectIO(ProjectBase):
 	#### IO FUNCTIONS ####################################################################
 	######################################################################################
 	
-	def save(self, data, project_path=None):
+	def save(self, data={}, project_path=None):
 		project_path = str(project_path) if project_path is not None else self.directory
 		if project_path is None: raise Exception('The project path is not defined')
 
