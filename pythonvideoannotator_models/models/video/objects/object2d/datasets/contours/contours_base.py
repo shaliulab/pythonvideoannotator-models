@@ -312,7 +312,10 @@ class ContoursBase(Dataset):
 
         return img
 
-    def get_image(self, index, mask=False, frame=None, up=False, angle=None, margin=0, size=None):
+    def get_image(self, index, frame=None, mask=False, circular_mask=False, angle=False, margin=0, size=None):
+        
+        bounding_box = self.get_bounding_box(index)
+        if bounding_box is None: return False, None
         
         if type(frame) is not np.ndarray:
             # if the frame is None, get the frame from the video
@@ -323,49 +326,45 @@ class ContoursBase(Dataset):
 
         if mask:
             maskimg = np.zeros_like(frame)
-            cnt = self.get_contour(index)
-            if cnt is not None:
+            cnt     = self.get_contour(index)
+            if cnt is not None: 
                 cv2.fillPoly( maskimg, np.array([cnt]), (255,255,255) )
-            frame = cv2.bitwise_and(frame, maskimg)
-        #ROTATION_MARGIN = int(max(frame.shape[0],frame.shape[1])/2)
-
-        bounding_box = self.get_bounding_box(index)
-        if bounding_box is None: return False, None
+                if isinstance(mask, int):
+                    if (mask % 2)!=1: raise Exception('mask value should be odd.')
+                    kernel  = np.ones((mask,mask),np.uint8)
+                    erosion = cv2.erode(img,kernel)
+            frame   = cv2.bitwise_and(frame, maskimg)
         
-        x, y, w, h  = bounding_box
-        x, y, w, h  = x-margin, y-margin, w+margin*2, h+margin*2
+        if circular_mask:
+            maskimg = np.zeros_like(frame)
+            center  = self.get_position(index)
+            cv2.circle(maskimg, center, circular_mask, (255,255,255), -1)
+            frame = cv2.bitwise_and(frame, maskimg)
+        
+        bigger_side  = max(bounding_box[2], bounding_box[3])
+        x, y, xx, yy = x-margin-bigger_side, y-margin-bigger_side, \
+                       x+w+margin*2+bigger_side*2, y+h+margin*2+bigger_side*2
+   
+        if angle:
+            cut = self.__cut_image(frame, x, y, xx, yy)
             
-        if up:
-            #x, y, w, h  = x-ROTATION_MARGIN, y-ROTATION_MARGIN, w+ROTATION_MARGIN*2, h+ROTATION_MARGIN*2   
-            
-            cut = self.__cut_image(frame, x,y,x+w,y+h)
-                            
-            rotrad   = self.get_angle(index) if angle is None else angle
-            rotdeg   = math.degrees( rotrad )
-            img2save = rotate_image(cut, rotdeg+90)
+            if angle=='up': angle = self.get_angle(index)
+            rotdeg   = math.degrees( angle )
+            img2save = rotate_image( cut, rotdeg+90)
 
-            result = img2save
+            center = img2save.shape[1]/2, img2save.shape[0]/2
+            half_w = (w+margin*2)
+            half_h = (h+margin*2)
 
-            # we expanded the margin for rotated images so we don't have strange forms exported.
-            # put it to use for the size
-            #x  = ROTATION_MARGIN
-            #y  = ROTATION_MARGIN
-            #xx = img2save.shape[1] - ROTATION_MARGIN
-            #yy = img2save.shape[0] - ROTATION_MARGIN
-            
-            #result = self.__cut_image(img2save, x,y,xx,yy)
+            result = self.__cut_image(frame, 
+                center[0]-half_w, center[1]-half_h,
+                center[0]+half_w, center[1]+half_h,
+            )
         else:
             result = self.__cut_image(frame, x,y,x+w,y+h)
 
         if size is not None:
-            w, h   = size
-            hh, ww = result.shape[:2]
-            if w>ww or h>hh:
-                img = (np.zeros( (size[1], size[0], result.shape[2]), dtype=result.dtype)) if len(result.shape)==3 else (np.zeros( (size[1], size[0]), dtype=result.dtype))
-   
-                mx, my = (w-ww)/2, (h-hh)/2
-                img[int(my):int(result.shape[0]+my), int(mx):int(result.shape[1]+mx)] = result
-                result = img
+            result = cv2.resize(result, size)
         return True, result
 
 
