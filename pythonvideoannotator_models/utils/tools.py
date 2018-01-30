@@ -65,13 +65,14 @@ def getTranslationMatrix2d(dx, dy):
     return np.matrix([[1, 0, dx], [0, 1, dy], [0, 0, 1]])
 
 
-def rotate_image(image, angle):
+def rotate_image(image, angle, image_center=None):
     """
     Rotates the given image about it's centre
     """
 
     image_size = (image.shape[1], image.shape[0])
-    image_center = tuple(np.array(image_size) / 2)
+    if image_center is None:
+        image_center = tuple(np.array(image_size) / 2)
 
     rot_mat = np.vstack([cv2.getRotationMatrix2D(image_center, angle, 1.0), [0, 0, 1]])
     trans_mat = np.identity(3)

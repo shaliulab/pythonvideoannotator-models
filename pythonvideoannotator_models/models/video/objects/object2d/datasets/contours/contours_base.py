@@ -297,23 +297,38 @@ class ContoursBase(Dataset):
 
     def __cut_image(self, frame, x, y, xx, yy):
         x, y, xx, yy = round(x), round(y), round(xx), round(yy)
-        x, y, xx, yy = int(x), int(y), int(xx), int(yy)
+        x, y, xx, yy = int(x),   int(y),   int(xx),   int(yy)
 
+        
         if len(frame.shape)==3:
             img = np.zeros( (yy-y, xx-x, frame.shape[2]), dtype=frame.dtype)
         else:
             img = np.zeros( (yy-y, xx-x), dtype=frame.dtype)
 
-        _x, _y, _xx, _yy = x, y, xx, yy
-        if _x<0: _x=0
-        if _y<0: _y=0
-        if _xx>frame.shape[1]: _xx = int(frame.shape[1])
-        if _yy>frame.shape[0]: _yy = int(frame.shape[0])
+        _x  = x if x>=0 else 0
+        _y  = y if y>=0 else 0
+        _xx = xx if xx<=frame.shape[1] else frame.shape[1]
+        _yy = yy if yy<=frame.shape[0] else frame.shape[0]
+        frame_crop = frame[_y:_yy, _x:_xx]
 
-        x1, y1, xx1, yy1 = _x-x, _y-y, _xx, _yy
+        
+        x1, y1   = _x-x, _y-y
+        xx1, yy1 = _xx+x1, _yy+y1
+        
+        if xx>frame.shape[1]: xx1 = x1+frame_crop.shape[1]
+        if yy>frame.shape[0]: yy1 = y1+frame_crop.shape[0]
+        #print(x1, y1, xx1, yy1, "|", _x, _y, _xx, _yy, "|",x, y, xx, yy)
+        """
         if xx1>img.shape[1]: xx1 = int(img.shape[1])
         if yy1>img.shape[0]: yy1 = int(img.shape[0])
-        img[y1:yy1, x1:xx1] = frame[_y:_yy, _x:_xx]
+
+        if (xx1-x1)>(_xx-_x):
+            x1, xx1 = (xx1-x1)/2-(_xx-_x)/2, (xx1-x1)/2+(_xx-_x)/2
+        if (yy1-y1)>(_yy-_y): 
+            y1, yy1 = (yy1-y1)/2-(_yy-_y)/2, (yy1-y1)/2+(_yy-_y)/2
+        """
+        img[y1:yy1, x1:xx1] = frame_crop
+        
 
         return img
 
@@ -326,10 +341,12 @@ class ContoursBase(Dataset):
         margin=0, 
         size=None,
         stretch=False,
+        image_center=None 
     ):
         bounding_box = self.get_bounding_box(index)
         if bounding_box is None: return False, None
-        
+
+
         if type(frame) is not np.ndarray:
             # if the frame is None, get the frame from the video
             cap = self.object2d.video.video_capture
@@ -337,17 +354,21 @@ class ContoursBase(Dataset):
             res, frame = cap.read()
             if not res: return False, None #exit in the case the frame was not read.
 
-         
+        #frame[image_center[1]-4:image_center[1]+4, image_center[0]-4:image_center[0]+4] = 255
+
+        ################################################################################################
+        # MASK THE IMAGE 
         if mask:
             maskimg = np.zeros_like(frame)
             cnt     = self.get_contour(index)
             if cnt is not None: 
                 cv2.fillPoly( maskimg, np.array([cnt]), (255,255,255) )
                 if not isinstance(mask, bool) and isinstance(mask, int):
-                    if (mask % 2)!=1: raise Exception('mask value should be odd.')
+                    if (mask % 2)!=1: 
+                        mask += 1
                     kernel  = np.ones((mask,mask),np.uint8)
                     maskimg = cv2.dilate(maskimg,kernel)
-            frame   = cv2.bitwise_and(frame, maskimg)
+            frame = cv2.bitwise_and(frame, maskimg)
         
         if circular_mask:
             maskimg = np.zeros_like(frame)
@@ -357,7 +378,6 @@ class ContoursBase(Dataset):
 
         if ellipse_mask:
             maskimg = np.zeros_like(frame)
-            center  = self.get_fit_ellipse(index)
             (x,y),(MA,ma),a = self.get_fit_ellipse(index)
             cv2.ellipse(maskimg,
                 (int(round(x)),int(round(y)) ),( int(round(MA)), int(round(ma)) ) ,int(round(a)),0,360,(255,255,255), -1)
@@ -370,29 +390,55 @@ class ContoursBase(Dataset):
             box = np.int0(box)
             cv2.fillPoly( maskimg, np.array([box]), (255,255,255) )
             frame = cv2.bitwise_and(frame, maskimg)
+        ################################################################################################
         
         bigger_side  = max(bounding_box[2], bounding_box[3])
         x, y, w, h   = bounding_box
+        """if image_center is not None:
+            x, y, xx, yy = image_center[0]-w/2, image_center[1]-h/2, image_center[0]+w/2, image_center[1]+h/2
+        else:
+        """
         x, y, xx, yy = x, y, x+w, y+h
-        x, y, xx, yy =  x-margin, y-margin, xx+margin, yy+margin
+        x, y, xx, yy = x-margin, y-margin, xx+margin, yy+margin
+
+        cut_center = (x+xx)/2, (y+yy)/2
 
         if angle:
-            safe_margin = bigger_side/2
-            x, y, xx, yy =  x-safe_margin, y-safe_margin, xx+safe_margin, yy+safe_margin
-   
+            safe_margin  = bigger_side/2
+            x, y, xx, yy = x-safe_margin, y-safe_margin, xx+safe_margin, yy+safe_margin
+            
+            #print('cut', index, frame.shape, x, y, xx, yy)
             cut = self.__cut_image(frame, x, y, xx, yy)
-        
-            if angle=='up': angle = self.get_angle(index)
-            if angle=='down': angle = self.get_angle(index)+np.pi
-            rotdeg   = math.degrees( angle )
-            img2save = rotate_image( cut, rotdeg+90)
 
-            h, w = img2save.shape[:2]
+          
+            if angle=='up':     angle = self.get_angle(index)
+            if angle=='down':   angle = self.get_angle(index)+np.pi
+            rotdeg = math.degrees( angle )
+
+
+            if image_center is not None:
+                #o = cut.copy()
+                x_shift, y_shift = int(round(cut_center[0]-image_center[0])), int(round(cut_center[1]-image_center[1]))
+                M   = np.float32([[1,0,x_shift],[0,1,y_shift]])
+                cut = cv2.warpAffine(cut,M,(cut.shape[1],cut.shape[0]))
+
+                #cut[cut.shape[0]/2-4:cut.shape[0]/2+4, cut.shape[1]/2-4:cut.shape[1]/2+4,0] = 255
+                #cut[cut.shape[0]/2-4:cut.shape[0]/2+4, cut.shape[1]/2-4:cut.shape[1]/2+4,1:] = 0
+
+                #cv2.imwrite('test/{0}.png'.format(index), cut )
+            
+            #cv2.imwrite('test/{0}.png'.format(index), cut )
+
+            img2save = rotate_image( cut, rotdeg+90)
+            #img2save[:,:,1] = rotate_image( o,   rotdeg+90)[:,:,1]
+            #img2save[:,:,0] = 0
+
 
             _, sizes, _ = self.get_rotatedrectangle(index)
             center_x, center_y = img2save.shape[1]/2, img2save.shape[0]/2
             (width, height) = min(sizes), max(sizes)
 
+            
             result = self.__cut_image(img2save, 
                 center_x-width/2-margin, center_y-height/2-margin,
                 center_x+width/2+margin, center_y+height/2+margin
@@ -405,23 +451,27 @@ class ContoursBase(Dataset):
                 result = cv2.resize(result, size)
             else:
                 h, w = result.shape[:2]
-                if w<=size[0] and h>size[1]:
-                    ratio = float(size[1])/float(h)
-                    new_w, new_h = int(round(w*ratio)), int(round(h*ratio))
-                    result = cv2.resize(result, (new_w, new_h) )
-                elif h<=size[1] and w>size[0]:
-                    ratio = float(size[0])/float(w)
-                    new_w, new_h = int(round(w*ratio)), int(round(h*ratio))
-                    result = cv2.resize(result, (new_w, new_h) )
-                
+                if w>size[0] or h>size[1]:
+                    if h>w:
+                        ratio = float(size[1])/float(h)
+                        new_w, new_h = int((w*ratio)), int((h*ratio))
+                        result = cv2.resize(result, (new_w, new_h) )
+                    else:
+                        ratio = float(size[0])/float(w)
+                        new_w, new_h = int((w*ratio)), int((h*ratio))
+                        result = cv2.resize(result, (new_w, new_h) )
+
                 if len(result.shape)>2:
                     final = np.zeros( (size[0], size[1], result.shape[2]), dtype=result.dtype)
                 else:
                     final = np.zeros( (size[0], size[1]), dtype=result.dtype)
-                x, y, xx, yy =  (size[0]/2)-(w/2), (size[1]/2)-(h/2), \
-                                (size[0]/2)+(w/2), (size[1]/2)+(h/2)
 
+                hh, ww       =  final.shape[:2]
+                h, w         =  result.shape[:2]
+                x, y, xx, yy =  (ww/2)-(w/2), (hh/2)-(h/2), \
+                                (ww/2)+(w/2), (hh/2)+(h/2)
                 x, y, xx, yy = int(x), int(y), int(xx), int(yy)
+
                 final[y:yy, x:xx] = result
                 result = final
 
