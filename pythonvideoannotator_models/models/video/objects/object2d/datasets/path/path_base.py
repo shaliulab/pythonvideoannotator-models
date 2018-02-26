@@ -25,7 +25,11 @@ class PathBase(Dataset):
 
 	def __len__(self): 					 return len(self._points)
 	def __getitem__(self, index): 		 return self.get_position(index)
-	def __setitem__(self, index, value): self.set_position(index, value[0], value[1])
+	def __setitem__(self, index, value):
+		if value is None:
+			self.set_position(index, None, None)
+		else:
+			self.set_position(index, value[0], value[1])
 	def __str__(self):					 return self.name
 
 	######################################################################
