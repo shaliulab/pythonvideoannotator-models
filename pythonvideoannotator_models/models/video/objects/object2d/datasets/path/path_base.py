@@ -47,7 +47,7 @@ class PathBase(Dataset):
 	def calculate_tmp_interpolation(self): 
 		#store a temporary path to visualize the interpolation 
 		begin 		= self._sel_pts[0]
-		end 		= self._sel_pts[1]
+		end 		= self._sel_pts[-1]
 		positions 	= [[i, self.get_position(i)] for i in range(begin, end+1) if self.get_position(i) is not None]
 
 		if len(positions)>=2:
@@ -159,9 +159,9 @@ class PathBase(Dataset):
 		for item in self._sel_pts: #store a temporary path for interpolation visualization
 			self.draw_circle(frame, item)
 
-		if 1 <= len(self._sel_pts) == 2: #store a temporary path for interpolation visualization
+		if 1 <= len(self._sel_pts) >= 2: #store a temporary path for interpolation visualization
 			start = self._sel_pts[0] #store a temporary path for interpolation visualization
-			end = frame_index if len(self._sel_pts)==1 else self._sel_pts[1]
+			end = frame_index if len(self._sel_pts)==1 else self._sel_pts[-1]
 			self.draw_path(frame, start, end)
 
 		# Draw a temporary path
