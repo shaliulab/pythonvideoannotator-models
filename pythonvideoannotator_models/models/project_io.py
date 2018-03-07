@@ -50,7 +50,7 @@ class ProjectIO(ProjectBase):
 		project_path = str(project_path) if project_path is not None else self.directory
 		if project_path is None: raise Exception('The project path was not defined')
 
-		self._directory = project_path
+		self._directory = os.path.abspath(project_path)
 
 		project_filename = os.path.join(str(project_path), 'project.json')
 		with open(project_filename, 'r') as outfile:
