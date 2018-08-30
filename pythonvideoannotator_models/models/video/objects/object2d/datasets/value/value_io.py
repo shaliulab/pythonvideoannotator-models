@@ -9,6 +9,29 @@ class ValueIO(ValueBase):
     #### IO FUNCTIONS ####################################################################
     ######################################################################################
 
+    def __len__(self):
+        if self.filepath: self.__lazy_load()
+        return super().__len__()
+    def __getitem__(self, index): 
+        if self.filepath: self.__lazy_load()
+        return super().__getitem__(index)
+
+    def __lazy_load(self):
+        with open(self.filepath, 'rb') as infile:
+            self.filepath = None
+            infile.readline()
+            for i, line in enumerate(infile):
+                csvrow = line[:-1].split(b';')
+
+                if csvrow[1] is None: continue
+                if len(csvrow[1])==0: continue
+                if csvrow[1]=='None': continue
+
+                frame = int(csvrow[0])
+                value = eval(csvrow[1])
+                self.set_value(frame, value)
+
+
     def save(self, data, dataset_path=None):
         data = super(ValueIO, self).save(data, dataset_path)
 
@@ -26,22 +49,9 @@ class ValueIO(ValueBase):
     def load(self, data, dataset_path=None):
         data = super(ValueIO, self).load(data, dataset_path)
 
-        dataset_file = os.path.join(dataset_path, 'values.cvs')
+        self.filepath = os.path.join(dataset_path, 'values.cvs')
         
-        with open(dataset_file, 'rb') as infile:
-            infile.readline()
-            for i, line in enumerate(infile):
-                csvrow = line[:-1].split(b';')
-
-                if csvrow[1] is None: continue
-                if len(csvrow[1])==0: continue
-                if csvrow[1]=='None': continue
-
-                frame = int(csvrow[0])
-                value = eval(csvrow[1])
-                self.set_value(frame, value)
-
-        return data
+        
 
 
     def import_csv(self, filename, first_row=0, col_frame=0, col_value=1):

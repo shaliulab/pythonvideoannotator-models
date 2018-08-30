@@ -4,8 +4,9 @@ class ValueBase(Dataset):
 
 	def __init__(self, object2d):
 		super(ValueBase, self).__init__(object2d)
-		self.name 	 = 'value({0})'.format(len(object2d))  if len(object2d)>0 else 'value'
-		self._values = []
+		self.filepath = None # used for lazy load
+		self.name 	  = 'value({0})'.format(len(object2d))  if len(object2d)>0 else 'value'
+		self._values  = []
 
 		
 	######################################################################
