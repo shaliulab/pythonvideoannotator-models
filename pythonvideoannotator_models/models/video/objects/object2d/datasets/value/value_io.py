@@ -16,6 +16,16 @@ class ValueIO(ValueBase):
         if self.filepath: self.__lazy_load()
         return super().__getitem__(index)
 
+    @property
+    def values(self):
+        if self.filepath: self.__lazy_load()
+        return ValueBase.values.fget(self)
+    @values.setter
+    def values(self, values):
+        self.filepath = None
+        return ValueBase.values.fset(self, values)
+
+
     def __lazy_load(self):
         with open(self.filepath, 'rb') as infile:
             self.filepath = None
