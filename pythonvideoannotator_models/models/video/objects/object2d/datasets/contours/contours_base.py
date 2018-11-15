@@ -132,7 +132,20 @@ class ContoursBase(Dataset):
         else:
             return None, None
 
-    def draw_path(frame, start=None, end=None): pass
+    def draw_path(self, frame, start=None, end=None):
+
+        if start is None:
+            start=0
+        if end is None:
+            end=len(self._contours)
+
+        points = []
+        for index in range(start, end):
+            points.append(self.get_position(index))
+
+        cnt = np.int32([p for p in points if p is not None])
+
+        cv2.polylines(frame, [cnt], False, (0,0,255), 1, lineType=cv2.LINE_AA)
 
     def get_angle_diff_to_zero(self, index):
         angle = self.get_angle(index)
