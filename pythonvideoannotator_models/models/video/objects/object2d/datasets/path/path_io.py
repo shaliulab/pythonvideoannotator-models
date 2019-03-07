@@ -13,7 +13,7 @@ class PathIO(PathBase):
     def save(self, data, dataset_path=None):
         #data = super(PathIO, self).save(data, dataset_path)
 
-        dataset_file = os.path.join(dataset_path, 'path.cvs')
+        dataset_file = os.path.join(dataset_path, 'path.csv')
         with open(dataset_file, 'wb') as outfile:
             outfile.write((';'.join(['frame','x','y'])+'\n').encode())
             for index in range(len(self)):
@@ -25,15 +25,20 @@ class PathIO(PathBase):
         # save the referencial data
         data['apply-referencial'] = self.apply_referencial
         data['referencial-point'] = self.referencial
-
+        data['show-name'] = self.show_name
+        data['show-object-name'] = self.show_object_name
 
         super(PathIO,self).save(data, dataset_path)
         return data
 
     def load(self, data, dataset_path=None):
         data = super(PathIO, self).load(data, dataset_path)
-        
-        dataset_file = os.path.join(dataset_path, 'path.cvs')   
+
+        dataset_file = os.path.join(dataset_path, 'path.csv')
+
+        # Fix a bug where files previously were saved with the extension cvs
+        if not os.path.exists(dataset_file):
+            dataset_file = os.path.join(dataset_path, 'path.cvs')
 
         with open(dataset_file, 'rb') as infile:
             infile.readline()
@@ -51,6 +56,8 @@ class PathIO(PathBase):
         ref                     = data.get('referencial-point', None)
         self.referencial        = tuple(ref) if ref else None
         self.apply_referencial  = data.get('apply-referencial', False)
+        self.show_name          = data.get('show-name', False)
+        self.show_object_name   = data.get('show-object-name', False)
 
         return data
 

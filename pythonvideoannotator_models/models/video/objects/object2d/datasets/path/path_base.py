@@ -18,6 +18,9 @@ class PathBase(Dataset):
 		self._tmp_points= [] #store a temporary path to pre-visualize de interpolation
 		self._sel_pts 	= [] #store the selected points
 
+		self._show_object_name = True # Flag to show or hide the object name
+		self._show_name = True # Flag to show or hide the name
+
 		
 	######################################################################
 	### CLASS FUNCTIONS ##################################################
@@ -140,6 +143,30 @@ class PathBase(Dataset):
 		cv2.circle(frame, pos, 8, (255,255,255), -1, lineType=cv2.LINE_AA)
 		cv2.circle(frame, pos, 6, (100,0,100), 	 -1, lineType=cv2.LINE_AA)
 
+	def draw_objname(self, frame, frame_index):
+		"""
+		Draw the name of the object
+		:param numpy.array frame: Frame image
+		:param int frame_index: Index of the frame to be draw
+		"""
+		pos = self.get_position(frame_index)
+		if pos is None: return
+
+		cv2.putText(frame, self.object2d.name, (pos[0], pos[1] - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 3, cv2.LINE_AA)
+		cv2.putText(frame, self.object2d.name, (pos[0], pos[1] - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2, cv2.LINE_AA)
+
+	def draw_name(self, frame, frame_index):
+		"""
+		Draw the name of the object
+		:param numpy.array frame: Frame image
+		:param int frame_index: Index of the frame to be draw
+		"""
+		pos = self.get_position(frame_index)
+		if pos is None: return
+
+		cv2.putText(frame, self.name, (pos[0], pos[1] + 25), cv2.FONT_HERSHEY_SIMPLEX, .7, (255, 255, 255), 3, cv2.LINE_AA)
+		cv2.putText(frame, self.name, (pos[0], pos[1] + 25), cv2.FONT_HERSHEY_SIMPLEX, .7, (0, 90, 0), 2, cv2.LINE_AA)
+
 	def draw_path(self,frame, start=None, end=None):
 		# Draw the selected path #store a temporary path for interpolation visualization
 		points = self._points
@@ -169,10 +196,31 @@ class PathBase(Dataset):
 			cnt = np.int32(self._tmp_points)
 			cv2.polylines(frame, [cnt], False, (255, 0, 0), 1, lineType=cv2.LINE_AA)
 
+		if self.show_object_name:
+			self.draw_objname(frame, frame_index)
+
+		if self.show_name:
+			self.draw_name(frame, frame_index)
+
 
 	######################################################################
 	### PROPERTIES #######################################################
 	######################################################################
+
+	@property
+	def show_object_name(self):
+		return self._show_object_name
+	@show_object_name.setter
+	def show_object_name(self, value):
+		self._show_object_name = value
+
+	@property
+	def show_name(self):
+		return self._show_name
+
+	@show_name.setter
+	def show_name(self, value):
+		self._show_name = value
 
 	@property
 	def interpolation_mode(self): return None
@@ -186,3 +234,11 @@ class PathBase(Dataset):
 	def apply_referencial(self):  return self._apply_referencial
 	@apply_referencial.setter
 	def apply_referencial(self, value): self._apply_referencial = value
+
+	@property
+	def data(self):
+		return self._points
+
+	@data.setter
+	def data(self, value):
+		self._points = value

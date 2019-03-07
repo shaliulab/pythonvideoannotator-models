@@ -45,7 +45,7 @@ class ValueIO(ValueBase):
     def save(self, data, dataset_path=None):
         data = super(ValueIO, self).save(data, dataset_path)
 
-        dataset_file = os.path.join(dataset_path, 'values.cvs')
+        dataset_file = os.path.join(dataset_path, 'values.csv')
         with open(dataset_file, 'wb') as outfile:
             outfile.write((';'.join(['frame','value'])+'\n' ).encode( ))
             for index in range(len(self)):
@@ -59,7 +59,13 @@ class ValueIO(ValueBase):
     def load(self, data, dataset_path=None):
         data = super(ValueIO, self).load(data, dataset_path)
 
-        self.filepath = os.path.join(dataset_path, 'values.cvs')
+        dataset_file = os.path.join(dataset_path, 'values.csv')
+
+        # Fix a bug where files previously were saved with the extension cvs
+        if not os.path.exists(dataset_file):
+            dataset_file = os.path.join(dataset_path, 'values.cvs')
+
+        self.filepath = dataset_file
         
         
 
