@@ -21,7 +21,7 @@ class Object2dIO(Object2dBase):
 		for dataset in self._datasets:
 			dataset_path = os.path.join(datasets_path, dataset.name)
 			if not os.path.exists(dataset_path): os.makedirs(dataset_path)
-			data = dataset.save({}, dataset_path)
+			dataset.save({}, dataset_path)
 			datasets.append(dataset.directory)
 		
 		for dataset_path in list_folders_in_path(datasets_path):

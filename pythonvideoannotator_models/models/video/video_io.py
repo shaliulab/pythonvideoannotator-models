@@ -57,7 +57,7 @@ class VideoIO(VideoBase):
 				dataset_conf 	= json.load(infile)
 				func 			= getattr(self, dataset_conf['factory-function'])
 				dataset 		= func()
-				dataset.load(data, obj_dir)
+				dataset.load(dataset_conf, obj_dir)
 				dataset.name    = name
 
 		super(VideoIO, self).load(data, video_path)

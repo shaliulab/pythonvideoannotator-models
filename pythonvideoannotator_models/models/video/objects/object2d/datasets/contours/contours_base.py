@@ -43,6 +43,7 @@ class ContoursBase(Dataset):
     def get_position(self, index):
         cnt = self.get_contour(index)
         if cnt is None: return None
+
         M = cv2.moments(cnt)
         if M["m00"]==0:
             return None
@@ -161,6 +162,7 @@ class ContoursBase(Dataset):
         return min_dist_angles(a1, a2) if (a1 is not None and a2 is not None) else None
 
     def get_contour(self, index):
+
         if index<0 or index>=len(self._contours): return None
         return self._contours[index] if self._contours[index] is not None else None
 
@@ -496,4 +498,10 @@ class ContoursBase(Dataset):
     ### PROPERTIES #######################################################
     ######################################################################
 
-    
+    @property
+    def data(self):
+        return self._contours
+
+    @property
+    def angles(self):
+        return self._angles

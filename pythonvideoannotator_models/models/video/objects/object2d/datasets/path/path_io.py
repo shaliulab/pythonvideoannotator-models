@@ -11,7 +11,6 @@ class PathIO(PathBase):
     ######################################################################################
 
     def save(self, data, dataset_path=None):
-        #data = super(PathIO, self).save(data, dataset_path)
 
         dataset_file = os.path.join(dataset_path, 'path.csv')
         with open(dataset_file, 'wb') as outfile:
@@ -25,10 +24,10 @@ class PathIO(PathBase):
         # save the referencial data
         data['apply-referencial'] = self.apply_referencial
         data['referencial-point'] = self.referencial
-        data['show-name'] = self.show_name
-        data['show-object-name'] = self.show_object_name
+        data['show-name']         = self.show_name
+        data['show-object-name']  = self.show_object_name
 
-        super(PathIO,self).save(data, dataset_path)
+        data = super(PathIO,self).save(data, dataset_path)
         return data
 
     def load(self, data, dataset_path=None):
