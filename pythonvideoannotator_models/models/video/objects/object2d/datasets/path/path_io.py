@@ -17,7 +17,9 @@ class PathIO(PathBase):
             outfile.write((';'.join(['frame','x','y'])+'\n').encode())
             for index in range(len(self)):
                 pos = self.get_position(index, use_referencial=False)
-                row = [index] + ([None, None] if pos is None else list(pos))
+                was_modified = self.was_modified(index)
+                was_switched = self.was_identity_switched(index)
+                row = [index] + ([None, None] if pos is None else list(pos)) + [was_modified, was_switched]
                 outfile.write((';'.join( map(str,row) )).encode( ))
                 outfile.write(b'\n')
 
@@ -39,17 +41,30 @@ class PathIO(PathBase):
         if not os.path.exists(dataset_file):
             dataset_file = os.path.join(dataset_path, 'path.cvs')
 
-        with open(dataset_file, 'rb') as infile:
-            infile.readline()
-            for i, line in enumerate(infile):
-                csvrow = line[:-1].split(b';')
+        with open(dataset_file, 'U') as csvfile:
+            dialect = csv.Sniffer().sniff(csvfile.read(2048))
+            csvfile.seek(0)
+            spamreader = csv.reader(csvfile, dialect)
+            next(spamreader)
+            for row in spamreader:
+                frame = int(row[0])
+                x = None if row[1] == 'None' or row[1].strip() == '' else float(row[1])
+                y = None if row[2] == 'None' or row[2].strip() == '' else float(row[2])
+                was_modified = row[3] if len(row)>3 else False
+                was_switched = row[4] if len(row)>4 else False
 
-                if csvrow[1] is None or csvrow[2] is None:      continue
-                if len(csvrow[1])==0 or len(csvrow[2])==0:      continue
-                if csvrow[1] == b'None' or csvrow[2] == b'None':continue
-                
-                frame, x, y = int(csvrow[0]), int(csvrow[1]), int(csvrow[2])
-                self.set_position(frame, x, y)
+                # does not the set the coordinates if they are None
+                if x is not None and y is not None and x!='None' and y!='None':
+                    self.set_position(frame, float(x), float(y))
+
+                if frame >= len(self._modified):
+                    self._modified += [False] * (frame+1-len(self._modified))
+                self._modified[frame] = was_modified or was_modified=='True'
+
+                if frame >= len(self._identity_switched):
+                    self._identity_switched += [False] * (frame+1-len(self._identity_switched))
+                self._identity_switched[frame] = was_switched or was_switched=='True'
+
 
         # load the referencial data
         ref                     = data.get('referencial-point', None)
@@ -62,9 +77,20 @@ class PathIO(PathBase):
 
 
 
-    def import_csv(self, filename, first_row=0, col_frame=0, col_x=1, col_y=2):
 
-        with open(filename, 'U') as csvfile:
+
+
+    def import_csv(self, filepath, first_row=0, col_frame=0, col_x=1, col_y=2):
+        """
+        Import path from a CSV file.
+
+        :param str filepath: Path of the file to import.
+        :param int first_row: First row index with data.
+        :param int col_frame: Column index with the frame index.
+        :param int col_x: Column index of the x coordinate.
+        :param int col_y: Column index of the y coordinate.
+        """
+        with open(filepath, 'U') as csvfile:
             dialect = csv.Sniffer().sniff(csvfile.read(2048))
             csvfile.seek(0)
             spamreader = csv.reader(csvfile, dialect)
@@ -86,4 +112,7 @@ class PathIO(PathBase):
                 y = None if y=='None' or y.strip()=='' else float(y)
 
                 if x is not None and y is not None and not math.isnan(x) and not math.isnan(y):
-                    self.set_position(frame, int(round(x,0)), int(round(y,0)))
+                    self.set_position(frame, x, y)
+
+            self._modified = []          # store all the frames where there were manual modifications.
+            self._identity_switched = [] # store all the identification switches

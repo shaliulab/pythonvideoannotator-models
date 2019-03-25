@@ -12,8 +12,10 @@ class PathBase(Dataset):
 		self.name 		= 'path({0})'.format(len(object2d))  if len(object2d)>0 else 'path'
 
 		self._apply_referencial = False
-		self._referencial 		= None #point to be use as reference point to the path
-		self._points 	= []  #path of the object
+		self._referencial 		= None # point to be use as reference point to the path
+		self._points 			= []   # path of the object
+		self._modified     		= []   # store all the frames where there were manual modifications.
+		self._identity_switched   = []   # store all the identification switches
 
 		self._tmp_points= [] #store a temporary path to pre-visualize de interpolation
 		self._sel_pts 	= [] #store the selected points
@@ -27,7 +29,15 @@ class PathBase(Dataset):
 	######################################################################
 
 	def __len__(self): 					 return len(self._points)
-	def __getitem__(self, index): 		 return self.get_position(index)
+	def __getitem__(self, index):
+
+		if isinstance(index, slice):
+			# Get the start, stop, and step from the slice
+			return [self.get_position(i) for i in range(index.start, index.stop) ]
+		else:
+			return self.get_position(index)
+
+
 	def __setitem__(self, index, value):
 		if value is None:
 			self.set_position(index, None, None)
@@ -85,6 +95,18 @@ class PathBase(Dataset):
 		if v1 is None or v2 is None: return None
 		return v2[0]-v1[0], v2[1]-v1[1]
 
+	def was_modified(self, index):
+		if len(self._modified)<=index:
+			return False
+		else:
+			return self._modified[index]
+
+	def was_identity_switched(self, index):
+		if len(self._identity_switched)<=index:
+			return False
+		else:
+			return self._identity_switched[index]
+
 	def get_position(self, index, use_referencial=True):
 		if index<0 or index>=len(self): return None
 
@@ -102,26 +124,52 @@ class PathBase(Dataset):
 	def set_position(self, index, x, y):
 		# add positions in case they do not exists
 		if index >= len(self):
-			for i in range(len(self), index + 1): self._points.append(None)
+			self._points += [None]*(index+1-len(self))
+
+		if index >= len(self._modified):
+			self._modified += [False] * (index+1-len(self._modified))
 
 		if x is None or y is None: 
 			self._points[index] = None
 		else:
 			# create a new moment in case it does not exists
-			self._points[index] = int(round(x)),int(round(y))
+			self._points[index] = x,y
 
-	def set_data_from_blob(self,index, blob):
+		self._modified[index] = True
+
+
+	def set_data_from_blob(self, index, blob):
 		if blob is None: 
 			self.set_position(index, None, None)
 		else:
 			x, y = blob.centroid
 			self.set_position(index, x, y)
-			
 
 	def collide_with_position(self, index, x, y, radius=20):
 		p1 = self.get_position(index)
 		if p1 is None: return False
 		return math.sqrt((p1[0] - x)**2 + (p1[1] - y)**2) < radius
+	
+	def switch_identity(self,
+			positions,
+			begin=0,
+			end=None
+		):
+		"""
+		Switch identity with other path.
+
+		:param list((float,float)) positions: Path to switch identity with.
+		:param int begin: Start frame. By default it starts in the frame 0.
+		:param int end: Last frame. By default if no frame is defined it replaces the entire path.
+		"""
+		if end >= len(self): self._points += [None] * (len(self) - end + 1)
+		if end >= len(self._identity_switched):
+			self._identity_switched += [False] * (len(self._identity_switched) - end + 1)
+
+		if end is None: end = len(self)
+
+		self._points[begin:end+1] 			 = positions[begin:end+1]
+		self._identity_switched[begin:end+1] = [True]*(end-begin+1)
 	
 	######################################################################
 	### VIDEO EVENTS #####################################################
@@ -130,16 +178,18 @@ class PathBase(Dataset):
 	def draw_circle(self, frame, frame_index):
 		position = self.get_position(frame_index)
 		if position != None:
-			cv2.circle(frame, position[:2], 20, (255, 255, 255), 4, lineType=cv2.LINE_AA)  # pylint: disable=no-member
-			cv2.circle(frame, position[:2], 20, (50, 50, 255), 1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
+			pos = int(round(position[0], 0)), int(round(position[1], 0))
+			cv2.circle(frame, pos, 20, (255, 255, 255), 4, lineType=cv2.LINE_AA)  # pylint: disable=no-member
+			cv2.circle(frame, pos, 20, (50, 50, 255), 1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
 
-			cv2.putText(frame, str(frame_index), position[:2], cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), thickness=2, lineType=cv2.LINE_AA)  # pylint: disable=no-member
-			cv2.putText(frame, str(frame_index), position[:2], cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), thickness=1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
+			cv2.putText(frame, str(frame_index), pos, cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), thickness=2, lineType=cv2.LINE_AA)  # pylint: disable=no-member
+			cv2.putText(frame, str(frame_index), pos, cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), thickness=1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
 
 	def draw_position(self, frame, frame_index):
 		pos = self.get_position(frame_index)
 		if pos is None: return
-		
+
+		pos = int(round(pos[0],0)), int(round(pos[1],0))
 		cv2.circle(frame, pos, 8, (255,255,255), -1, lineType=cv2.LINE_AA)
 		cv2.circle(frame, pos, 6, (100,0,100), 	 -1, lineType=cv2.LINE_AA)
 
@@ -152,6 +202,7 @@ class PathBase(Dataset):
 		pos = self.get_position(frame_index)
 		if pos is None: return
 
+		pos = int(round(pos[0], 0)), int(round(pos[1], 0))
 		cv2.putText(frame, self.object2d.name, (pos[0], pos[1] - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 3, cv2.LINE_AA)
 		cv2.putText(frame, self.object2d.name, (pos[0], pos[1] - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2, cv2.LINE_AA)
 
@@ -164,6 +215,7 @@ class PathBase(Dataset):
 		pos = self.get_position(frame_index)
 		if pos is None: return
 
+		pos = int(round(pos[0], 0)), int(round(pos[1], 0))
 		cv2.putText(frame, self.name, (pos[0], pos[1] + 25), cv2.FONT_HERSHEY_SIMPLEX, .7, (255, 255, 255), 3, cv2.LINE_AA)
 		cv2.putText(frame, self.name, (pos[0], pos[1] + 25), cv2.FONT_HERSHEY_SIMPLEX, .7, (0, 90, 0), 2, cv2.LINE_AA)
 
@@ -242,3 +294,7 @@ class PathBase(Dataset):
 	@data.setter
 	def data(self, value):
 		self._points = value
+
+	@property
+	def selected_frames(self):
+		return self._sel_pts
