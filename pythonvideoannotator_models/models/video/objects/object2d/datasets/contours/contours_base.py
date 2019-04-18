@@ -279,7 +279,7 @@ class ContoursBase(Dataset):
         self._angles[index] = angle
     
     
-    def calc_walked_distance(self, window_size):
+    def calc_walked_distance(self, window_size=0):
         """
         Calculate the walked distance and the total walked distance and the walked distance in a window of frames
         """
@@ -288,12 +288,16 @@ class ContoursBase(Dataset):
         for i in range(len(self)):
             vel = self.get_absolute_velocity(i)
             if vel is None: vel = 0
-            walked_distance.append( vel + (walked_distance[i-1] if i>0 else 0) )
-            walked_distance_window.append( walked_distance[i] - (walked_distance[i-window_size] if i>window_size else 0) )
+            walked_distance.append(
+                vel + (walked_distance[i-1] if i>0 else 0)
+            )
+            walked_distance_window.append(
+                walked_distance[i] - (walked_distance[i-window_size] if i>window_size else 0)
+            )
         return walked_distance, walked_distance_window
     
 
-    def calc_walked_distance_with_direction(self, window_size):
+    def calc_walked_distance_with_direction(self, window_size=0):
         """
         Calculate the walked distance and the total walked distance and the walked distance in a window of frames
         """
