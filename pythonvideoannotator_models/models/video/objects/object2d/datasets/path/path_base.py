@@ -6,6 +6,17 @@ from pythonvideoannotator_models.models.video.objects.object2d.datasets.dataset 
 
 class PathBase(Dataset):
 
+    COLORS = [
+        (240, 163, 255), (0, 117, 220), (153, 63, 0), (76, 0, 92),
+        (25, 25, 25), (0, 92, 49), (43, 206, 72), (255, 204, 153),
+        (128, 128, 128), (148, 255, 181), (143, 124, 0), (157, 204, 0),
+        (194, 0, 136), (0, 51, 128), (255, 164, 5), (255, 168, 187),
+        (66, 102, 0), (255, 0, 16), (94, 241, 242), (0, 153, 143),
+        (116, 10, 255), (153, 0, 0), (255, 255, 0), (255, 80, 5)
+    ]
+
+    count_paths = 0
+
     def __init__(self, object2d):
         super(PathBase, self).__init__(object2d)
 
@@ -20,9 +31,17 @@ class PathBase(Dataset):
         self._tmp_points= [] #store a temporary path to pre-visualize de interpolation
         self._sel_pts   = [] #store the selected points
 
+
+
+        self._color = self.COLORS[PathBase.count_paths]
+
+        PathBase.count_paths += 1
+        if PathBase.count_paths>=len(self.COLORS):
+            PathBase.count_paths = 0
+
         self._show_object_name = True # Flag to show or hide the object name
         self._show_name = True # Flag to show or hide the name
-        
+
     ######################################################################
     ### CLASS FUNCTIONS ##################################################
     ######################################################################
@@ -184,16 +203,13 @@ class PathBase(Dataset):
             cv2.putText(frame, str(frame_index), pos, cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), thickness=2, lineType=cv2.LINE_AA)  # pylint: disable=no-member
             cv2.putText(frame, str(frame_index), pos, cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), thickness=1, lineType=cv2.LINE_AA)  # pylint: disable=no-member
 
-    def draw_position(self, frame, frame_index, color):
+    def draw_position(self, frame, frame_index):
         pos = self.get_position(frame_index)
         if pos is None: return
 
-        if color is None:
-            color = (100, 0, 100)
-
         pos = int(round(pos[0],0)), int(round(pos[1],0))
         cv2.circle(frame, pos, 8, (255,255,255), -1, lineType=cv2.LINE_AA)
-        cv2.circle(frame, pos, 6, color,     -1, lineType=cv2.LINE_AA)
+        cv2.circle(frame, pos, 6, self.color,     -1, lineType=cv2.LINE_AA)
 
     def draw_objname(self, frame, frame_index):
         """
@@ -227,10 +243,10 @@ class PathBase(Dataset):
         if end:   points = points[:end]
         if start: points = points[start:]
         cnt = np.int32([p for p in points if p is not None])
-        cv2.polylines(frame, [cnt], False, (0,0,255), 1, lineType=cv2.LINE_AA)
+        cv2.polylines(frame, [cnt], False, self.color, 1, lineType=cv2.LINE_AA)
 
-    def draw(self, frame, frame_index, color):
-        self.draw_position(frame, frame_index, color)
+    def draw(self, frame, frame_index):
+        self.draw_position(frame, frame_index)
 
         if self.referencial:
             cv2.circle(frame, self.referencial, 8, (0,255,0), -1, lineType=cv2.LINE_AA)
@@ -240,15 +256,17 @@ class PathBase(Dataset):
         for item in self._sel_pts: #store a temporary path for interpolation visualization
             self.draw_circle(frame, item)
 
+        # Draw a temporary path
+        if len(self._tmp_points) >= 2:
+            cnt = np.int32(self._tmp_points)
+            cv2.polylines(frame, [cnt], False, (255, 0, 0), 1, lineType=cv2.LINE_AA)
+
         if 1 <= len(self._sel_pts) >= 2: #store a temporary path for interpolation visualization
             start = self._sel_pts[0] #store a temporary path for interpolation visualization
             end = frame_index if len(self._sel_pts)==1 else self._sel_pts[-1]
             self.draw_path(frame, start, end)
 
-        # Draw a temporary path
-        if len(self._tmp_points)>=2:
-            cnt = np.int32(self._tmp_points)
-            cv2.polylines(frame, [cnt], False, (255, 0, 0), 1, lineType=cv2.LINE_AA)
+
 
         if self.show_object_name:
             self.draw_objname(frame, frame_index)
@@ -267,6 +285,17 @@ class PathBase(Dataset):
     @show_object_name.setter
     def show_object_name(self, value):
         self._show_object_name = value
+
+    @property
+    def color(self):
+        if self._color is None:
+            return (100, 0, 100)
+        else:
+            return self._color
+
+    @color.setter
+    def color(self, value):
+        self._color = value
 
     @property
     def show_name(self):
