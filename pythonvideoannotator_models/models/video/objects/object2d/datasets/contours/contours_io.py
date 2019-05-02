@@ -18,6 +18,8 @@ class ContoursIO(ContoursBase):
 				outfile.write((';'.join( map(str,row) )).encode( ))
 				outfile.write(b'\n')
 
+		data['color'] = self.color
+
 		return data
 
 	def load(self, data, dataset_path=None):
@@ -48,5 +50,6 @@ class ContoursIO(ContoursBase):
 					else:
 						self.set_contour(frame, None, None)
 
+		self.color = data.get('color', self.color)
 
 		return data

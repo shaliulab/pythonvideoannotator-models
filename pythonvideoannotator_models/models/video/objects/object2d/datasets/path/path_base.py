@@ -32,7 +32,6 @@ class PathBase(Dataset):
         self._sel_pts   = [] #store the selected points
 
 
-
         self._color = self.COLORS[PathBase.count_paths]
 
         PathBase.count_paths += 1
@@ -289,9 +288,8 @@ class PathBase(Dataset):
     @property
     def color(self):
         if self._color is None:
-            return (100, 0, 100)
-        else:
-            return self._color
+            self._color = (255, 0, 0)
+        return self._color
 
     @color.setter
     def color(self, value):

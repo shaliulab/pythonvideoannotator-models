@@ -73,7 +73,7 @@ class PathIO(PathBase):
         self.apply_referencial  = data.get('apply-referencial', False)
         self.show_name          = data.get('show-name', False)
         self.show_object_name   = data.get('show-object-name', False)
-        self.color              = data.get('color', None)
+        self.color              = data.get('color', self.color)
 
         return data
 

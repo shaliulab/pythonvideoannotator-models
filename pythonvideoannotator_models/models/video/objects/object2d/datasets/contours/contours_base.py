@@ -7,6 +7,17 @@ from pythonvideoannotator_models.utils.tools import points_angle, min_dist_angle
 
 class ContoursBase(Dataset):
 
+    COLORS = [
+        (240, 163, 255), (0, 117, 220), (153, 63, 0), (76, 0, 92),
+        (25, 25, 25), (0, 92, 49), (43, 206, 72), (255, 204, 153),
+        (128, 128, 128), (148, 255, 181), (143, 124, 0), (157, 204, 0),
+        (194, 0, 136), (0, 51, 128), (255, 164, 5), (255, 168, 187),
+        (66, 102, 0), (255, 0, 16), (94, 241, 242), (0, 153, 143),
+        (116, 10, 255), (153, 0, 0), (255, 255, 0), (255, 80, 5)
+    ]
+
+    count_contours = 0
+
     def __init__(self, object2d):
         super(ContoursBase, self).__init__(object2d)
         
@@ -14,6 +25,12 @@ class ContoursBase(Dataset):
         self.name       = 'contours({0})'.format(len(object2d)) if len(object2d)>0 else 'contours'
         self._contours  = []
         self._angles    = []
+
+        self._color = self.COLORS[ContoursBase.count_contours]
+
+        ContoursBase.count_contours += 1
+        if ContoursBase.count_contours>=len(self.COLORS):
+            ContoursBase.count_contours = 0
 
 
         
@@ -146,7 +163,7 @@ class ContoursBase(Dataset):
 
         cnt = np.int32([p for p in points if p is not None])
 
-        cv2.polylines(frame, [cnt], False, (0,0,255), 1, lineType=cv2.LINE_AA)
+        cv2.polylines(frame, [cnt], False, self.color, 1, lineType=cv2.LINE_AA)
 
     def get_angle_diff_to_zero(self, index):
         angle = self.get_angle(index)
@@ -509,3 +526,14 @@ class ContoursBase(Dataset):
     @property
     def angles(self):
         return self._angles
+
+    @property
+    def color(self):
+        if self._color is None:
+            self._color = (255, 0, 0)
+        return self._color
+
+
+    @color.setter
+    def color(self, value):
+        self._color = value
