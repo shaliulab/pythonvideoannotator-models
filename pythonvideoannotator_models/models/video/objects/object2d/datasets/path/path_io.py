@@ -45,7 +45,8 @@ class PathIO(PathBase):
         with open(dataset_file, 'U') as csvfile:
             dialect = csv.Sniffer().sniff(csvfile.read(2048))
             csvfile.seek(0)
-            spamreader = csv.reader(csvfile, dialect)
+            spamreader = csv.reader(csvfile, dialect, delimiter=';')
+
             next(spamreader)
             for row in spamreader:
                 frame = int(row[0])
