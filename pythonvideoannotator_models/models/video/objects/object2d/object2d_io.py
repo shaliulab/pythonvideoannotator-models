@@ -32,7 +32,7 @@ class Object2dIO(Object2dBase):
 		return data
 
 	def load(self, data, object2d_path=None):
-		data = super(Object2dIO, self).save(data, object2d_path)
+		data = super(Object2dIO, self).load(data, object2d_path)
 
 		dirname = os.path.basename(object2d_path)
 		
