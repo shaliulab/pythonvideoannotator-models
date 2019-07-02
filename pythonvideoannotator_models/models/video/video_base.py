@@ -23,22 +23,22 @@ class VideoBase(IModel):
 		self._filename = None
 		self._videocap = None
 		
-		self._childrens = []
+		self._children = []
 			
 
 	######################################################################################
 	#### FUNCTIONS #######################################################################
 	######################################################################################
 
-	def __len__(self): return len(self._childrens)
+	def __len__(self): return len(self._children)
 	def __str__(self): return self.name
 
 	def __add__(self, obj):
-		if isinstance(obj, VideoObject): self._childrens.append(obj)
+		if isinstance(obj, VideoObject): self._children.append(obj)
 		return self
 
 	def __sub__(self, obj):
-		if isinstance(obj, VideoObject):  self._childrens.remove(obj)
+		if isinstance(obj, VideoObject):  self._children.remove(obj)
 		return self
 
 	def create_object(self): 	return Object2D(self)
@@ -56,26 +56,30 @@ class VideoBase(IModel):
 	######################################################################################
 
 	@property
-	def objects(self): return self._childrens
+	def children(self):
+		return self.objects
+
+	@property
+	def objects(self): return self._children
 
 	@property
 	def objects2D(self):
-		for child in self._childrens:
+		for child in self._children:
 			if isinstance(child, Object2D): yield child
 
 	@property
 	def images(self): 
-		for child in self._childrens:
+		for child in self._children:
 			if isinstance(child, Image): yield child
 
 	@property
 	def geometries(self): 
-		for child in self._childrens:
+		for child in self._children:
 			if isinstance(child, Geometry): yield child
 
 	@property
 	def notes(self): 
-		for child in self._childrens:
+		for child in self._children:
 			if isinstance(child, Note): yield child
 
 

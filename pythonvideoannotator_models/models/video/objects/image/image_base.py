@@ -6,7 +6,7 @@ class ImageBase(VideoObject):
 	def __init__(self, video):
 		super(ImageBase, self).__init__()
 
-		self.name 	= 'image({0})'.format(len(video)) if len(video)>0 else 'image'
+		self.name 	= video.generate_child_name('Image ')
 		self.image 	= None
 
 		self._video = video

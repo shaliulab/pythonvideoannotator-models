@@ -13,6 +13,7 @@ class ProjectIO(ProjectBase):
 	######################################################################################
 	
 	def save(self, data={}, project_path=None):
+
 		project_path = str(project_path) if project_path is not None else self.directory
 		if project_path is None: raise Exception('The project path is not defined')
 
@@ -48,7 +49,9 @@ class ProjectIO(ProjectBase):
 	def load(self, data, project_path=None):
 
 		project_path = str(project_path) if project_path is not None else self.directory
-		if project_path is None: raise Exception('The project path was not defined')
+
+		if project_path is None:
+			raise Exception('The project path was not defined')
 
 		self._directory = os.path.abspath(project_path)
 

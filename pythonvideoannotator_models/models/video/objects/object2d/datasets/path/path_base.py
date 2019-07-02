@@ -20,7 +20,7 @@ class PathBase(Dataset):
     def __init__(self, object2d):
         super(PathBase, self).__init__(object2d)
 
-        self.name       = 'path({0})'.format(len(object2d))  if len(object2d)>0 else 'path'
+        self.name       = object2d.generate_child_name('Path ')
 
         self._apply_referencial = False
         self._referencial       = None # point to be use as reference point to the path

@@ -6,7 +6,7 @@ class GeometryBase(VideoObject):
 	def __init__(self, video):
 		super(GeometryBase, self).__init__()
 
-		self.name 	= 'geometry({0})'.format(len(video)) if len(video)>0 else 'geometry'
+		self.name = video.generate_child_name('Geometry ')
 		self._geometry 	= []
 
 		self._video = video

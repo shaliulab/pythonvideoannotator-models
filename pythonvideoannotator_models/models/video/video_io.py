@@ -20,12 +20,12 @@ class VideoIO(VideoBase):
 		############## save objects #############
 		objects_path = os.path.join(video_path, 'objects')
 		if not os.path.exists(objects_path): os.makedirs(objects_path)
-		for obj in self._childrens: 
+		for obj in self._children:
 			obj_path = os.path.join(objects_path, obj.name)
 			if not os.path.exists(obj_path): os.makedirs(obj_path)
 			obj.save({}, obj_path)
 		# remove not used objects ###############
-		objects_paths = [os.path.join(objects_path, obj.name) for obj in self._childrens]
+		objects_paths = [os.path.join(objects_path, obj.name) for obj in self._children]
 		for obj_path in tools.list_folders_in_path(objects_path):
 			if obj_path not in objects_paths: send2trash(obj_path)
 		#########################################

@@ -14,7 +14,7 @@ class Object2dBase(VideoObject):
 		self._video = video
 		self._video += self
 			
-		self.name = 'object({0})'.format(len(video)) if len(video)>0 else 'object'
+		self.name = video.generate_child_name('Object ')
 
 		
 
@@ -58,6 +58,9 @@ class Object2dBase(VideoObject):
 	### PROPERTIES #######################################################
 	######################################################################
 
+	@property
+	def children(self):
+		return self.datasets
 
 	@property
 	def datasets(self): return self._datasets

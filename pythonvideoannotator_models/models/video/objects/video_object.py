@@ -6,6 +6,10 @@ class VideoObject(IModel):
 
 	FACTORY_FUNCTION = ''
 
+	def __init__(self, video=None):
+		super().__init__()
+		self._video = video
+
 	def save(self, data, path=None):
 		data['factory-function'] = self.FACTORY_FUNCTION
 		conf_path = os.path.join(path, 'dataset.json')

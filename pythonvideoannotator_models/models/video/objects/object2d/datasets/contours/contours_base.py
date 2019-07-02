@@ -22,7 +22,7 @@ class ContoursBase(Dataset):
         super(ContoursBase, self).__init__(object2d)
         
         self.object2d   = object2d
-        self.name       = 'contours({0})'.format(len(object2d)) if len(object2d)>0 else 'contours'
+        self.name       = object2d.generate_child_name('Contours ')
         self._contours  = []
         self._angles    = []
 

@@ -6,7 +6,7 @@ class NoteBase(VideoObject):
 	def __init__(self, video):
 		super(NoteBase, self).__init__()
 
-		self.name 	= 'note({0})'.format(len(video)) if len(video)>0 else 'note'
+		self.name 	= video.generate_child_name('Note ')
 		self._note 	= ''
 
 		self._video = video

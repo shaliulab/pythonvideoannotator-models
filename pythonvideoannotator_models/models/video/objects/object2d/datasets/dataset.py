@@ -10,7 +10,7 @@ class Dataset(IModel):
 
 		object2d   		+= self
 		self.object2d   = object2d
-		self.name 		= 'dataset({0})'.format(len(object2d.datasets))
+		self.name 		= object2d.generate_child_name('Dataset ')
 
 
 	@property
