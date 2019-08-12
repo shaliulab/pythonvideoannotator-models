@@ -32,6 +32,7 @@ class VideoIO(VideoBase):
 
 		videoconf = os.path.join(video_path, 'video.json')
 		data['video-filepath'] = os.path.relpath(self.filepath, start=self.project.directory)
+		data['multiple-files'] = self.multiple_files
 		with open(videoconf, 'w') as outfile:
 			json.dump(data, outfile)
 
@@ -45,7 +46,9 @@ class VideoIO(VideoBase):
 		
 		with open(videoconf, 'r') as outfile:
 			data = json.load(outfile)
+		self.multiple_files = data.get('multiple-files', False)
 		self.filepath = os.path.join(self.project.directory ,data['video-filepath'])
+
 
 		objects_path = os.path.join(video_path, 'objects')
 		objects_dirs = tools.list_folders_in_path(objects_path)

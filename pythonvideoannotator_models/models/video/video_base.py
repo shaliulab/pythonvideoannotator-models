@@ -3,6 +3,7 @@
 #from pythonvideoannotator_models.video.objects import Objects
 
 import cv2, os
+from pyforms_gui.controls.control_player.multiple_videocapture import MultipleVideoCapture
 from pythonvideoannotator_models.models.video.objects.video_object import VideoObject
 from pythonvideoannotator_models.models.video.objects.object2d import Object2D
 from pythonvideoannotator_models.models.video.objects.image import Image
@@ -22,6 +23,7 @@ class VideoBase(IModel):
 		self.name 	   = ''
 		self._filename = None
 		self._videocap = None
+		self._multiple_files = False
 		
 		self._children = []
 			
@@ -88,7 +90,10 @@ class VideoBase(IModel):
 	@filepath.setter
 	def filepath(self, value): 
 		self._filename = value
-		self._videocap = cv2.VideoCapture(value)
+		if self._multiple_files:
+			self._videocap = MultipleVideoCapture(value)
+		else:
+			self._videocap = cv2.VideoCapture(value)
 		filename 	   = os.path.basename(value)
 		self.name, _   = os.path.splitext(filename)
 
@@ -114,4 +119,12 @@ class VideoBase(IModel):
 
 	@property
 	def directory(self): return os.path.join( self.project.directory, 'videos', self.name )
+
+	@property
+	def multiple_files(self):
+		return self._multiple_files
+
+	@multiple_files.setter
+	def multiple_files(self, value):
+		self._multiple_files = True
 	
