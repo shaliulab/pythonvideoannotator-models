@@ -126,5 +126,5 @@ class VideoBase(IModel):
 
 	@multiple_files.setter
 	def multiple_files(self, value):
-		self._multiple_files = True
+		self._multiple_files = value
 	
