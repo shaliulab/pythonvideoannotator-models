@@ -3,7 +3,10 @@
 #from pythonvideoannotator_models.video.objects import Objects
 
 import cv2, os
+import logging
+
 from pyforms_gui.controls.control_player.multiple_videocapture import MultipleVideoCapture
+from pyforms_gui.controls.control_player.multiple_feed_capture import MultiFeedCapture
 from pythonvideoannotator_models.models.video.objects.video_object import VideoObject
 from pythonvideoannotator_models.models.video.objects.object2d import Object2D
 from pythonvideoannotator_models.models.video.objects.image import Image
@@ -11,8 +14,25 @@ from pythonvideoannotator_models.models.video.objects.geometry import Geometry
 from pythonvideoannotator_models.models.video.objects.note import Note
 from pythonvideoannotator_models.models.imodel import IModel
 
+from confapp import conf
+logger = logging.getLogger(__name__)
+
+# if getattr(conf, "VIDEO_CAPTURE", "cv2") == "cv2":
+#     logger.warning("cv2 selected")
+#     VideoCaptureClass = cv2.VideoCapture
+# elif conf.VIDEO_CAPTURE == "MultipleFeedcapture":
+#     logger.warning("MultiFeedCapture selected")
+#     VideoCaptureClass = MultiFeedCapture
+# else:
+#     logger.warning("Unknown player passed. I will keep default cv2")
+#     VideoCaptureClass = cv2.VideoCapture
+
+VideoCaptureClass = MultiFeedCapture
 
 class VideoBase(IModel):
+
+	VideoCapture = VideoCaptureClass
+
 
 	def __init__(self, project):
 		super(IModel, self).__init__()
@@ -93,7 +113,7 @@ class VideoBase(IModel):
 		if self._multiple_files:
 			self._videocap = MultipleVideoCapture(value)
 		else:
-			self._videocap = cv2.VideoCapture(value)
+			self._videocap = self.VideoCapture(value)
 		filename 	   = os.path.basename(value)
 		self.name, _   = os.path.splitext(filename)
 
