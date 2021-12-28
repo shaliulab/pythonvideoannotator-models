@@ -3,6 +3,7 @@
 #from pythonvideoannotator_models.video.objects import Objects
 
 import cv2, os
+from imgstore.multistores import MultiStore
 from pyforms_gui.controls.control_player.multiple_videocapture import MultipleVideoCapture
 from pythonvideoannotator_models.models.video.objects.video_object import VideoObject
 from pythonvideoannotator_models.models.video.objects.object2d import Object2D
@@ -83,13 +84,25 @@ class VideoBase(IModel):
 	def notes(self): 
 		for child in self._children:
 			if isinstance(child, Note): yield child
-
+	
+	def filepath_setter(self, value, **kwargs):
+		if value.endswith("metadata.yaml"):
+			self._filename = value
+			self._videocap = MultiStore.new_for_filename(
+				value,
+				**kwargs
+			)
+			filename 	   = os.path.basename(value)
+			self.name, _   = os.path.splitext(filename)
+		else:
+			self.filepath = value
 
 	@property
 	def filepath(self): return self._filename
+
 	@filepath.setter
-	def filepath(self, value): 
-		self._filename = value
+	def filepath(self, value):
+		self._filename = value		
 		if self._multiple_files:
 			self._videocap = MultipleVideoCapture(value)
 		else:
