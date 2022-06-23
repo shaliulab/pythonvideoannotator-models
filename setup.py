@@ -11,11 +11,14 @@ with open(os.path.join(PACKAGE_PATH, 'pythonvideoannotator_models','__init__.py'
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', content, re.MULTILINE).group(1)
 
 setup(
-	name='Python video annotator - models',
+	name='Python video annotator - models-shaliulab',
 	version=version,
 	description="""""",
 	author=['Ricardo Ribeiro'],
 	author_email='ricardojvr@gmail.com',
 	url='https://bitbucket.org/fchampalimaud/pythonvideoannotator-models',
 	packages=find_packages(),	
+        extras_require={
+            "imgstore": ["imgstore>=0.4.4"]
+        },
 )

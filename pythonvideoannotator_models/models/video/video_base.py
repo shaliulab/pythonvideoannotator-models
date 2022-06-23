@@ -11,6 +11,10 @@ from pythonvideoannotator_models.models.video.objects.geometry import Geometry
 from pythonvideoannotator_models.models.video.objects.note import Note
 from pythonvideoannotator_models.models.imodel import IModel
 
+try:
+    from imgstore.interface import VideoCapture
+except ModuleNotFoundError:
+    from cv2 import VideoCapture
 
 class VideoBase(IModel):
 
@@ -93,7 +97,7 @@ class VideoBase(IModel):
 		if self._multiple_files:
 			self._videocap = MultipleVideoCapture(value)
 		else:
-			self._videocap = cv2.VideoCapture(value)
+			self._videocap = VideoCapture(value)
 		filename 	   = os.path.basename(value)
 		self.name, _   = os.path.splitext(filename)
 
