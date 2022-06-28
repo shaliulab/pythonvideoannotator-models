@@ -90,15 +90,27 @@ class VideoBase(IModel):
 
 
 	@property
-	def filepath(self): return self._filename
+	def filepath(self): return (self._filename, self._chunk.value)
+
 	@filepath.setter
-	def filepath(self, value): 
-		self._filename = value
+	def filepath(self, value):
+		if type(value) is tuple:
+			self._filename = value[0]
+			if value[0].endswith("yaml"):
+				self._chunk.value  = str(value[1])
+		else:
+			self._filename = value
+
 		if self._multiple_files:
 			self._videocap = MultipleVideoCapture(value)
 		else:
-			self._videocap = VideoCapture(value)
-		filename 	   = os.path.basename(value)
+			try:
+				chunk = float(self._chunk.value)
+			except ValueError:
+				chunk = None
+
+			self._videocap = VideoCapture(self._filename, chunk=chunk)
+		filename 	   = os.path.basename(self._filename)
 		self.name, _   = os.path.splitext(filename)
 
 
